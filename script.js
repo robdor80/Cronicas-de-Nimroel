@@ -1,8 +1,8 @@
 /* ==========================================================
-   SANTUARIO · Lluvia de runas + Portal + Audio sin microcortes
+   SANTUARIO · Lluvia de runas + Portal + Secuencia de cantos
    ========================================================== */
 
-/* ---------- LLUVIA DE RUNAS (segura: no duplica) ---------- */
+/* ---------- LLUVIA DE RUNAS ---------- */
 const RUNES = ["ᚠ","ᚢ","ᚦ","ᚨ","ᚱ","ᚲ","ᚷ","ᚹ","ᚺ","ᚻ","ᚾ","ᛁ","ᛃ","ᛇ","ᛈ","ᛉ","ᛊ","ᛋ","ᛏ","ᛒ","ᛖ","ᛗ","ᛚ","ᛜ","ᛞ","ᛟ"];
 
 function initRuneRain(){
@@ -47,9 +47,15 @@ function initRuneRain(){
   }, 1800);
 }
 
-/* ---------- PORTAL (recuerdo de sesión) ---------- */
+/* ---------- PORTAL Y AUDIO ---------- */
 const GATE_KEY = 'nimroel_gate';
 const TTL_MIN  = 30;
+
+let sfxClick = null;
+let canto1 = null;
+let canto2 = null;
+let currentCanto = null;
+
 function gateIsValid(){
   try{
     const raw = sessionStorage.getItem(GATE_KEY);
@@ -62,80 +68,67 @@ function markGate(){
   try{ sessionStorage.setItem(GATE_KEY, JSON.stringify({ t: Date.now() })); }catch{}
 }
 
-/* ---------- AUDIO ---------- */
-/* campanita → HTMLAudio (sencillo)
-   canto → Web Audio API (sin cortes) */
-let sfxClick = null;
-
-// Contexto de audio (Web Audio API)
-let audioCtx, gainNode, bgBuffer = null, bgSource = null, bgReady = false;
-
-async function setupAudio(){
-  // Efecto click
+function preloadAudio(){
   try{
     sfxClick = new Audio('medios/audio/campanita.mp3');
     sfxClick.preload = 'auto';
     sfxClick.volume = 0.9;
-  }catch{}
 
-  // Contexto y cadena
-  const Ctx = window.AudioContext || window.webkitAudioContext;
-  audioCtx = new Ctx();
-  gainNode = audioCtx.createGain();
-  gainNode.gain.value = 0.5; // volumen del fondo
-  gainNode.connect(audioCtx.destination);
+    canto1 = new Audio('medios/audio/primer_canto.mp3');
+    canto1.preload = 'auto';
+    canto1.volume = 0.5;
 
-  // Descarga + decodificación del mp3 (en memoria)
-  try{
-    const resp = await fetch('medios/audio/canto_index.mp3', { cache: 'force-cache' });
-    const buf  = await resp.arrayBuffer();
-    bgBuffer   = await audioCtx.decodeAudioData(buf);
-    bgReady    = true;
+    canto2 = new Audio('medios/audio/segundo_canto.mp3');
+    canto2.preload = 'auto';
+    canto2.volume = 0.5;
+
+    // Enlazamos la secuencia: cuando termina uno, suena el otro
+    canto1.addEventListener('ended', () => {
+      currentCanto = canto2;
+      canto2.currentTime = 0;
+      canto2.play().catch(()=>{});
+    });
+
+    canto2.addEventListener('ended', () => {
+      currentCanto = canto1;
+      canto1.currentTime = 0;
+      canto1.play().catch(()=>{});
+    });
   }catch(e){
-    console.warn('No se pudo decodificar canto_index.mp3:', e);
+    console.warn('Audio no disponible:', e);
   }
 }
 
-// Arranca el loop sin cortes
-function startBgLoop(options = {}){
-  if(!audioCtx || !bgBuffer) return;
-  if(bgSource){ try{ bgSource.stop(); }catch{} bgSource.disconnect(); bgSource = null; }
-
-  bgSource = audioCtx.createBufferSource();
-  bgSource.buffer = bgBuffer;
-  bgSource.loop = true;
-
-  // Si conoces puntos de loop exactos (para MP3 con silencios), descomenta:
-  // bgSource.loopStart = 0.00;  // segundos
-  // bgSource.loopEnd   = bgBuffer.duration; // o un valor menor si tu archivo tiene cola
-
-  bgSource.connect(gainNode);
-
-  // Algunos navegadores inician contexto en "suspended" → resume al gesto
-  const startNow = () => {
-    audioCtx.resume().then(()=>{
-      bgSource.start(0);
-    }).catch(()=>{});
-  };
-  // Si ya venimos de una interacción (click en runa), esto será inmediato:
-  startNow();
+async function startCantos(){
+  if (!canto1 || !canto2) return;
+  try{
+    currentCanto = canto1;
+    canto1.currentTime = 0;
+    await canto1.play();
+  }catch(e){
+    // En algunos navegadores necesita gesto del usuario
+    const kick = () => {
+      canto1.play().catch(()=>{});
+      document.removeEventListener('click', kick);
+      document.removeEventListener('keydown', kick);
+      document.removeEventListener('touchstart', kick);
+    };
+    document.addEventListener('click', kick, { once:true });
+    document.addEventListener('keydown', kick, { once:true });
+    document.addEventListener('touchstart', kick, { once:true });
+  }
 }
 
-/* ---------- LÓGICA DEL PORTAL ---------- */
 async function unlockGate(){
-  // campanita
-  if(sfxClick){ try{ await sfxClick.play(); }catch{} }
-
-  // marca sesión
+  if(sfxClick){
+    try{ await sfxClick.play(); }catch{}
+  }
   markGate();
 
-  // oculta portal
   const gate = document.getElementById('gate');
   if(gate) gate.classList.add('hidden');
 
-  // Inicia canto sin cortes (ya decodificado)
-  if(bgReady){ startBgLoop(); }
-
+  await startCantos(); // inicia la secuencia canto1 → canto2 → bucle
   document.body.classList.add('crystal-awake');
 }
 
@@ -146,7 +139,7 @@ function initGate(){
 
   if(gateIsValid()){
     gate.classList.add('hidden');
-    if(bgReady){ startBgLoop(); }
+    startCantos();
   }
 
   btn.addEventListener('click', unlockGate);
@@ -160,11 +153,18 @@ function initGate(){
     if(gate.classList.contains('hidden')) return;
     if(e.key === 'Enter'){ unlockGate(); }
   });
+
+  // Detiene cantos al salir de la página
+  window.addEventListener('beforeunload', ()=>{
+    [canto1, canto2].forEach(a=>{
+      if(a){ a.pause(); a.currentTime = 0; }
+    });
+  });
 }
 
 /* ---------- INICIO ---------- */
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
+  preloadAudio();
   initRuneRain();
-  await setupAudio();  // decodifica el canto en memoria
   initGate();
 });
