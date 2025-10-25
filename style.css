@@ -432,37 +432,83 @@ body.crystal-awake #terminal {
   .music-toggle { right: 12px; bottom: 12px; width: 42px; height: 42px; }
 }
 
-.install-btn{
+/* ===== Botón Instalar (PWA) — estilo cristal ===== */
+#pwa-install {
   position: fixed;
-  bottom: 20px;
-  left: 22px;
-  z-index: 20;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 50;
+
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(180,210,255,.25);
-  background: radial-gradient(circle at 50% 30%, rgba(30,60,90,.45), rgba(10,20,40,.4));
-  color: #cfe3ff;
-  backdrop-filter: blur(8px) brightness(1.1);
-  -webkit-backdrop-filter: blur(8px) brightness(1.1);
-  box-shadow: 0 0 12px rgba(120,200,255,.25);
-  cursor: pointer;
-  transition: transform .2s, box-shadow .2s, color .2s, opacity .2s;
-}
-.install-btn:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 0 16px rgba(180,230,255,.4);
-  color: #fff8d0;
-}
-.install-btn:active{ transform: translateY(0); }
-.install-btn[hidden]{ display:none; }
 
-@media (max-width:600px){
-  .install-btn{ bottom: 72px; left: 14px; padding: 8px 12px; }
-  .install-btn svg{ width:20px; height:20px; }
+  padding: 10px 14px;
+  border-radius: 14px;
+
+  /* reset de botón nativo */
+  border: 1px solid rgba(185, 215, 255, 0.25);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(185, 215, 255, 0.08);
+  color: #eaf2ff;
+  font: 600 14px/1.1 "Cinzel", serif;
+  letter-spacing: .02em;
+  cursor: pointer;
+
+  /* cristal */
+  backdrop-filter: blur(10px) brightness(1.08);
+  -webkit-backdrop-filter: blur(10px) brightness(1.08);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease, opacity .2s ease;
 }
+
+#pwa-install:hover {
+  transform: translateY(-1px);
+  border-color: rgba(200, 230, 255, 0.45);
+  background: rgba(195, 225, 255, 0.12);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.4),
+    0 0 18px rgba(200,230,255,0.25);
+}
+
+#pwa-install:active {
+  transform: translateY(0);
+  background: rgba(175, 210, 255, 0.12);
+}
+
+/* icono */
+#pwa-install svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* estados */
+#pwa-install[hidden] { display: none !important; }
+#pwa-install.disabled {
+  opacity: .6;
+  pointer-events: none;
+}
+
+/* responsive */
+@media (max-width: 420px) {
+  #pwa-install { padding: 9px 12px; gap: 6px; border-radius: 12px; }
+  #pwa-install svg { width: 17px; height: 17px; }
+  #pwa-install span { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  #pwa-install { padding: 8px 10px; }
+  #pwa-install span { display: none; } /* deja solo el icono si el espacio es mínimo */
+}
+
+
 
 .install-btn.disabled { opacity:.6; cursor:default; }
 
