@@ -464,3 +464,5 @@ body.crystal-awake #terminal {
   .install-btn svg{ width:20px; height:20px; }
 }
 
+.install-btn.disabled { opacity:.6; cursor:default; }
+
