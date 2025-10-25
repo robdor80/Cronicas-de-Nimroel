@@ -291,3 +291,113 @@ window.addEventListener('DOMContentLoaded', async () => {
   await setupAudio();   // decodifica A y B
   initGate();           // si la sesión es válida, intenta arrancar A→B (con bypass gestual si hace falta)
 });
+
+
+/* ==========================================================
+   TARJETAS DE CRISTAL · Revelado, flotación y parallax
+   (pegar al final de script.js)
+   ========================================================== */
+(function cardsFX(){
+  const terminal   = document.getElementById('terminal');
+  const cardsWrap  = document.querySelector('.cards');
+  if(!terminal || !cardsWrap) return;
+  const cards = Array.from(cardsWrap.querySelectorAll('.card-glass'));
+  if(!cards.length) return;
+
+  let revealed = false;
+  let rafId = null;
+
+  // --- 1) Revelado escalonado cuando body gana 'crystal-awake'
+  function revealCards(){
+    if(revealed) return;
+    revealed = true;
+    const baseDelay = 100; // ms entre tarjeta y tarjeta
+    cards.forEach((card, i) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(16px) scale(0.98)';
+      card.style.transition = 'opacity .7s ease, transform .7s ease, box-shadow .3s ease';
+
+      setTimeout(()=>{
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0) scale(1)';
+      }, i * baseDelay + 150);
+    });
+  }
+
+  // Observa el body para saber cuándo aparece 'crystal-awake' (sin tocar tu código existente)
+  const mo = new MutationObserver(() => {
+    if(document.body.classList.contains('crystal-awake')){
+      revealCards();
+      mo.disconnect();
+    }
+  });
+  mo.observe(document.documentElement, { attributes:true, subtree:true, attributeFilter:['class'] });
+
+  // Si ya está activa al cargar (sesión recordada), dispara también
+  if(document.body.classList.contains('crystal-awake')) {
+    revealCards();
+    mo.disconnect();
+  }
+
+  // --- 2) Flotación suave (idle bobbing) + 3) Parallax con el ratón
+  const floats = cards.map((card, i) => ({
+    el: card,
+    seed: Math.random() * Math.PI * 2,
+    amp: 2 + Math.random() * 2,       // amplitud en px
+    speed: 0.4 + Math.random() * 0.5, // velocidad
+    baseX: 0,
+    baseY: 0,
+    parX: 0,
+    parY: 0
+  }));
+
+  // Parallax solo desktop
+  let targetParX = 0, targetParY = 0;
+  const desktop = matchMedia('(pointer:fine)').matches;
+  if(desktop){
+    window.addEventListener('mousemove', (e)=>{
+      const cx = window.innerWidth  * 0.5;
+      const cy = window.innerHeight * 0.5;
+      const dx = (e.clientX - cx) / cx;   // -1 .. 1
+      const dy = (e.clientY - cy) / cy;   // -1 .. 1
+      // máx ~6px lateral, ~4px vertical
+      targetParX = dx * 6;
+      targetParY = dy * 4;
+    });
+  }
+
+  function tick(t){
+    floats.forEach((f, i) => {
+      // easing hacia el objetivo de parallax (suave)
+      f.parX += (targetParX - f.parX) * 0.06;
+      f.parY += (targetParY - f.parY) * 0.06;
+
+      // flotación sinusoidal individual
+      const y = Math.sin((t/1000) * f.speed + f.seed) * f.amp;
+      const x = Math.cos((t/1100) * (f.speed*0.85) + f.seed) * (f.amp * 0.35);
+
+      f.el.style.transform = `translate3d(${(x + f.parX).toFixed(2)}px, ${(y + f.parY).toFixed(2)}px, 0)`;
+    });
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // Arranca animaciones cuando el terminal esté visible
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        if(!rafId) rafId = requestAnimationFrame(tick);
+      }else{
+        if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+      }
+    });
+  }, { threshold: 0.05 });
+  io.observe(terminal);
+
+  // Limpieza al salir de la página
+  window.addEventListener('pagehide', ()=>{
+    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+    io.disconnect();
+    mo.disconnect();
+  });
+})();
+
