@@ -255,12 +255,16 @@ function initGate(){
     document.body.classList.add('lock-scroll');
   }
 
-  if(gateIsValid()){
-    gate.classList.add('hidden');
-    document.body.classList.remove('lock-scroll');
-    scheduleAlternation('A');
-    if(audioCtx && audioCtx.state !== 'running'){ armAutoplayBypass('A'); }
+  if (gateIsValid()) {
+  gate.classList.add('hidden');
+  document.body.classList.remove('lock-scroll');
+  document.body.classList.add('crystal-awake');   // <- activa las tarjetas
+  scheduleAlternation('A');
+  if (audioCtx && audioCtx.state !== 'running') {
+    armAutoplayBypass('A');
   }
+}
+
 
   btn.addEventListener('click', unlockGate);
   btn.addEventListener('keydown', (e)=>{
@@ -424,3 +428,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 })();
+
+window.addEventListener('pageshow', (ev) => {
+  // Si volvemos desde el historial y la sesión sigue válida, asegura el estado
+  if (ev.persisted && gateIsValid()) {
+    const gate = document.getElementById('gate');
+    if (gate) gate.classList.add('hidden');
+    document.body.classList.remove('lock-scroll');
+    document.body.classList.add('crystal-awake');
+  }
+});
+

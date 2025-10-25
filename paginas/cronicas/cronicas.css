@@ -125,13 +125,20 @@ html, body {
   padding: 10px 12px;
   min-width: 200px;
   font: 600 14px/1 "Cinzel", serif;
-  color: #eaf2ff;
+  color: #fbfbfc; /* <<< texto oscuro para que se vea en todos los sistemas */
   background: rgba(185, 215, 255, 0.08);
   border: 1px solid var(--glass-stroke);
   border-radius: 10px;
   backdrop-filter: blur(10px) brightness(1.06);
   -webkit-backdrop-filter: blur(10px) brightness(1.06);
 }
+
+/* Opcional: refuerza también el color dentro del menú desplegable */
+.field select option {
+  color: #0c1020;
+  background: #e8efff; /* fondo claro azulado */
+}
+
 
 /* ---------- Pestañas ---------- */
 .tabs {
