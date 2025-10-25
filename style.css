@@ -431,3 +431,36 @@ body.crystal-awake #terminal {
   .card-body p { font-size: .78rem; }
   .music-toggle { right: 12px; bottom: 12px; width: 42px; height: 42px; }
 }
+
+.install-btn{
+  position: fixed;
+  bottom: 20px;
+  left: 22px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(180,210,255,.25);
+  background: radial-gradient(circle at 50% 30%, rgba(30,60,90,.45), rgba(10,20,40,.4));
+  color: #cfe3ff;
+  backdrop-filter: blur(8px) brightness(1.1);
+  -webkit-backdrop-filter: blur(8px) brightness(1.1);
+  box-shadow: 0 0 12px rgba(120,200,255,.25);
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s, color .2s, opacity .2s;
+}
+.install-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(180,230,255,.4);
+  color: #fff8d0;
+}
+.install-btn:active{ transform: translateY(0); }
+.install-btn[hidden]{ display:none; }
+
+@media (max-width:600px){
+  .install-btn{ bottom: 72px; left: 14px; padding: 8px 12px; }
+  .install-btn svg{ width:20px; height:20px; }
+}
+

@@ -461,3 +461,59 @@ window.addEventListener('DOMContentLoaded', async () => {
 })();
 
 
+// =====================
+// PWA: botón “Instalar”
+// =====================
+let deferredPrompt = null;
+const installBtn = document.getElementById('pwa-install');
+
+// Aparece el botón cuando el navegador nos “ofrece” instalar la PWA
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Evita el mini-infobar nativa
+  e.preventDefault();
+  deferredPrompt = e;
+  // Si no está ya instalada, mostramos el botón
+  if (!window.matchMedia('(display-mode: standalone)').matches && !navigator.standalone) {
+    installBtn.hidden = false;
+  }
+});
+
+// Al pulsar el botón: lanzamos el prompt
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    // iOS no dispara beforeinstallprompt. Mostramos ayuda sencilla.
+    if (isIOS() && !isInStandalone()) {
+      alert('Para instalar:\n1) Pulsa el botón “Compartir”.\n2) Elige “Añadir a pantalla de inicio”.\n3) Confirma el nombre y toca “Añadir”.');
+    }
+    return;
+  }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  // Si aceptó o rechazó, ocultamos el botón (Chrome no deja reintentar de inmediato)
+  installBtn.hidden = true;
+  deferredPrompt = null;
+  console.log('Instalación:', outcome); // 'accepted' | 'dismissed'
+});
+
+// Cuando la app se instala correctamente
+window.addEventListener('appinstalled', () => {
+  installBtn.hidden = true;
+  console.log('PWA instalada 🎉');
+});
+
+// Oculta el botón si ya se está ejecutando como app
+function isInStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+if (isInStandalone()) {
+  installBtn?.setAttribute('hidden', '');
+}
+
+// Detección simple de iOS (Safari móvil)
+function isIOS(){
+  const ua = window.navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+
+
