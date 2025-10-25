@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crónicas del Santuario — Archivos</title>
+
+  <!-- Estilos globales del proyecto -->
+  <link rel="stylesheet" href="../../style.css">
+  <!-- Estilos específicos de Crónicas (te lo paso después) -->
+  <link rel="stylesheet" href="cronicas.css">
+</head>
+<body>
+  <!-- Fondo opcional de runas (si luego quieres animación) -->
+  <div id="runeRain" aria-hidden="true"></div>
+
+  <header class="crumbs">
+    <a class="back" href="../../index.html" aria-label="Volver a la Terminal">
+      <!-- Flecha sencilla -->
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Terminal</span>
+    </a>
+    <h1>Crónicas del Santuario</h1>
+    <p class="subtitle">Consulta las entradas oficiales recopiladas por la Cadena de Cronistas.</p>
+  </header>
+
+  <!-- Barra de herramientas: búsqueda + filtros -->
+  <section class="toolbar" aria-label="Herramientas de consulta">
+    <div class="searchbox">
+      <label for="q" class="visually-hidden">Buscar en todas las crónicas</label>
+      <input id="q" type="search" placeholder="Buscar términos (reinos, batallas, nombres…)" autocomplete="off" />
+      <button id="btnSearch" class="btn" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="filters">
+      <div class="field">
+        <label for="f-era">Era</label>
+        <select id="f-era">
+          <option value="">Todas</option>
+          <option value="aurora">Era de la Aurora</option>
+          <option value="despertar">Era del Despertar</option>
+          <option value="conocimiento">Era del Conocimiento</option>
+          <option value="actual">Años previos a la novela</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="f-custodio">Custodio</label>
+        <select id="f-custodio">
+          <option value="">Todos</option>
+          <!-- Se rellena por JS más adelante -->
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pestañas: por Custodio / Todas las crónicas -->
+  <nav class="tabs" role="tablist" aria-label="Modos de exploración">
+    <button class="tab active" role="tab" aria-selected="true" data-tab="custodios">Explorar por Custodio</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="cronicas">Ver todas las crónicas</button>
+  </nav>
+
+  <main class="content">
+    <!-- Vista: tarjetas de Custodios -->
+    <section id="view-custodios" class="view active" aria-labelledby="tab-custodios">
+      <div class="grid custodios" id="grid-custodios">
+        <!-- Tarjetas de ejemplo (estáticas por ahora). Luego JS las generará desde JSON. -->
+        <a class="card-glass cust-card" href="custodios/jorvin.html">
+          <div class="avatar">
+            <img src="../../medios/img/custodios/jorvin.jpg" alt="" loading="lazy" />
+          </div>
+          <div class="meta">
+            <h3>Jorvin de Sariel</h3>
+            <p class="role">Magister Archivero</p>
+            <p class="era">Era del Conocimiento</p>
+          </div>
+        </a>
+
+        <a class="card-glass cust-card" href="custodios/aeras.html">
+          <div class="avatar">
+            <img src="../../medios/img/custodios/aeras.jpg" alt="" loading="lazy" />
+          </div>
+          <div class="meta">
+            <h3>Aeras Tel Sûl</h3>
+            <p class="role">Custodio VII</p>
+            <p class="era">Era del Despertar</p>
+          </div>
+        </a>
+        <!-- Añade más manualmente o deja que JS los cargue desde /data/custodios.json -->
+      </div>
+    </section>
+
+    <!-- Vista: todas las crónicas (lista paginada) -->
+    <section id="view-cronicas" class="view" aria-labelledby="tab-cronicas">
+      <div id="results-info" class="results-info">
+        <!-- JS mostrará "X resultados" / "Mostrando crónicas de ..." -->
+      </div>
+
+      <div class="grid cronicas" id="grid-cronicas">
+        <!-- Ítems de crónica (se rellenan desde JS). Ejemplo de estructura: -->
+        <!--
+        <article class="card-glass cr-item">
+          <h3 class="cr-title">Tratado de Ishrath</h3>
+          <p class="cr-meta">Custodio: Jorvin de Sariel · Era: Despertar · Año: 412 ED</p>
+          <p class="cr-excerpt">Mediación en el conflicto entre Raisoth y Silvannar que culminó con la fundación de Ishrath...</p>
+          <a class="cr-link" href="custodios/jorvin.html#ishrath">Leer</a>
+        </article>
+        -->
+      </div>
+
+      <!-- Controles de paginación (opcionales, luego JS) -->
+      <div class="pager" id="pager">
+        <!-- <button class="btn ghost" data-page="prev">Anterior</button>
+        <span class="pageinfo">Página 1 de 12</span>
+        <button class="btn ghost" data-page="next">Siguiente</button> -->
+      </div>
+    </section>
+  </main>
+
+  <!-- JS específico de Crónicas (te lo paso después) -->
+  <script src="cronicas.js" defer></script>
+</body>
+</html>
