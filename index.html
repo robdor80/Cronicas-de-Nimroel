@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Santuario de Nimroel — Terminal Arcana</title>
+  <!-- PWA: manifest + color de tema -->
+<link rel="manifest" href="/Cronicas-de-Nimroel/manifest.webmanifest">
+<meta name="theme-color" content="#0a0b12">
+
+<!-- iOS (instalación manual: Compartir → Añadir a pantalla de inicio) -->
+<link rel="apple-touch-icon" href="/Cronicas-de-Nimroel/medios/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Santuario">
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -131,5 +141,15 @@
       Esta Terminal requiere JavaScript habilitado.
     </div>
   </noscript>
+
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/Cronicas-de-Nimroel/service-worker.js")
+        .catch(err => console.warn("SW registration failed:", err));
+    });
+  }
+</script>
+
 </body>
 </html>

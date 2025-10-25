@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Generador de Iconos · Santuario de Nimroel</title>
+<style>
+  :root{
+    --bg:#0a0b12;
+    --gold1:#f3d88a; --gold2:#c9b06a;
+    --crystal1:#9fd1ff; --crystal2:#6aa8ff;
+  }
+  body{
+    background: radial-gradient(600px 400px at 70% -10%, #171a2a 0%, #0e111c 55%, var(--bg) 100%);
+    color:#e8f0ff; font-family: system-ui,ui-sans-serif,Segoe UI,Roboto,Arial;
+    min-height:100vh; margin:0; display:grid; place-items:center; padding:24px;
+  }
+  .wrap{max-width:980px; width:100%; display:grid; gap:18px;}
+  h1{font-size:1.2rem; font-weight:700; letter-spacing:.02em; margin:0 0 6px;}
+  .panel{
+    display:grid; grid-template-columns: 1fr 1fr;
+    gap:18px; align-items:center;
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:14px; padding:16px; backdrop-filter: blur(8px);
+  }
+  .preview{
+    display:grid; grid-template-columns: repeat(3, minmax(100px,1fr)); gap:12px;
+    align-items:center; justify-items:center;
+  }
+  canvas{background:transparent; border-radius:18px; box-shadow: 0 0 0 1px rgba(255,255,255,.08) inset;}
+  .controls{display:grid; gap:10px;}
+  button{
+    appearance:none; border:1px solid rgba(255,255,255,.18); color:#0a1020; font-weight:600;
+    background: linear-gradient(180deg,#f3d88a,#d8bf74);
+    border-radius:10px; padding:10px 12px; cursor:pointer;
+    box-shadow: 0 8px 22px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  button:hover{filter: brightness(1.06);}
+  .note{font-size:.9rem; color:#b7c3e2;}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  .tag{font:600 .8rem/1.1 system-ui; color:#bcd6ff; background:rgba(160,200,255,.08); border:1px solid rgba(180,210,255,.2); padding:6px 8px; border-radius:8px;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <h1>Generador de iconos del Santuario</h1>
+      <div class="row">
+        <div class="tag">icon-192.png</div>
+        <div class="tag">icon-512.png</div>
+        <div class="tag">maskable-512.png</div>
+      </div>
+      <p class="note">Pulsa los botones para descargar. Guarda los PNG en <code>medios/icons/</code>.</p>
+    </div>
+
+    <div class="panel">
+      <div class="preview">
+        <div>
+          <canvas id="c192" width="192" height="192"></canvas>
+          <div class="note" style="text-align:center;margin-top:6px;">192×192</div>
+        </div>
+        <div>
+          <canvas id="c512" width="256" height="256" style="transform:scale(0.5); transform-origin:center;"></canvas>
+          <div class="note" style="text-align:center;margin-top:6px;">512×512 (preview a 50%)</div>
+        </div>
+        <div>
+          <canvas id="cmask" width="256" height="256" style="transform:scale(0.5); transform-origin:center;"></canvas>
+          <div class="note" style="text-align:center;margin-top:6px;">Maskable 512 (preview a 50%)</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="b192">Descargar icon-192.png</button>
+        <button id="b512">Descargar icon-512.png</button>
+        <button id="bmask">Descargar maskable-512.png</button>
+        <p class="note">El icono incluye: anillo dorado, cristal azul y runa-ojO sobre libro (símbolo del Santuario). El <b>maskable</b> mantiene zona segura (márgenes) para recortes.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Dibuja el sello en un Canvas */
+function drawSeal(ctx, size, { maskable=false } = {}){
+  const w = size, h = size;
+  ctx.clearRect(0,0,w,h);
+
+  // Fondo transparente
+  // Zona segura: escalado distinto para maskable
+  const scale = maskable ? 0.75 : 0.88; // 75% para evitar recortes en recortes circulares o notch
+  const cx = w/2, cy = h/2;
+  const R  = (Math.min(w,h) / 2) * scale;
+
+  // Anillo exterior dorado
+  const gradRing = ctx.createLinearGradient(cx-R, cy-R, cx+R, cy+R);
+  gradRing.addColorStop(0, "#f3d88a");
+  gradRing.addColorStop(1, "#c9b06a");
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI*2);
+  ctx.lineWidth = Math.max(6, size * 0.04);
+  ctx.strokeStyle = gradRing;
+  ctx.stroke();
+
+  // Bisel interior tenue
+  ctx.beginPath();
+  ctx.arc(cx, cy, R*0.86, 0, Math.PI*2);
+  ctx.lineWidth = Math.max(3, size*0.02);
+  ctx.strokeStyle = "rgba(255,255,255,0.25)";
+  ctx.stroke();
+
+  // Disco de cristal (azules)
+  const rCrystal = R*0.78;
+  const gradCrystal = ctx.createRadialGradient(cx, cy-rCrystal*0.35, rCrystal*0.1, cx, cy, rCrystal);
+  gradCrystal.addColorStop(0, "#bfe0ff");
+  gradCrystal.addColorStop(1, "#6aa8ff");
+  ctx.beginPath();
+  ctx.arc(cx, cy, rCrystal, 0, Math.PI*2);
+  ctx.fillStyle = gradCrystal;
+  ctx.fill();
+
+  // Highlight del cristal
+  const hlR = rCrystal*0.9;
+  const gradHL = ctx.createRadialGradient(cx - rCrystal*0.35, cy - rCrystal*0.48, 1, cx - rCrystal*0.35, cy - rCrystal*0.48, hlR);
+  gradHL.addColorStop(0, "rgba(255,255,255,0.55)");
+  gradHL.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.beginPath();
+  ctx.arc(cx, cy, hlR, 0, Math.PI*2);
+  ctx.fillStyle = gradHL;
+  ctx.fill();
+
+  // Símbolo central: ojo-runa + libro
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // Libro (base)
+  const bookW = rCrystal*1.0, bookH = rCrystal*0.42;
+  ctx.beginPath();
+  const by = rCrystal*0.52;
+  ctx.moveTo(-bookW*0.48, by);
+  ctx.quadraticCurveTo(-bookW*0.24, by-bookH*0.65, 0, by-bookH*0.55);
+  ctx.quadraticCurveTo(bookW*0.24, by-bookH*0.65, bookW*0.48, by);
+  ctx.lineWidth = Math.max(2, size*0.015);
+  ctx.strokeStyle = "rgba(255,255,255,0.9)";
+  ctx.stroke();
+
+  // Ojo-runa
+  ctx.beginPath();
+  const rx = rCrystal*0.62, ry = rCrystal*0.38;
+  ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2);
+  ctx.lineWidth = Math.max(3, size*0.02);
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.stroke();
+
+  // Pupila
+  ctx.beginPath();
+  ctx.arc(0, 0, rCrystal*0.13, 0, Math.PI*2);
+  ctx.fillStyle = "#0a1020";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(0, 0, rCrystal*0.13, 0, Math.PI*2);
+  ctx.lineWidth = Math.max(2, size*0.014);
+  ctx.strokeStyle = "rgba(255,255,255,0.9)";
+  ctx.stroke();
+
+  // Trama runa vertical (como “iris”)
+  ctx.globalAlpha = 0.65;
+  for(let i=-3;i<=3;i++){
+    ctx.beginPath();
+    ctx.moveTo(i* rCrystal*0.09, -ry*0.85);
+    ctx.lineTo(i* rCrystal*0.09, ry*0.85);
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = Math.max(1, size*0.006);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+
+  // Brillo anular externo
+  const glow = ctx.createRadialGradient(cx, cy, R*0.85, cx, cy, R*1.08);
+  glow.addColorStop(0, "rgba(243,216,138,0.0)");
+  glow.addColorStop(1, "rgba(243,216,138,0.14)");
+  ctx.beginPath();
+  ctx.arc(cx, cy, R*1.05, 0, Math.PI*2);
+  ctx.fillStyle = glow;
+  ctx.fill();
+}
+
+/* Helpers para descargar PNG */
+function downloadCanvasPNG(canvas, filename, targetSize){
+  // redibuja a tamaño real pedido (para 512/512)
+  const tmp = document.createElement('canvas');
+  tmp.width = targetSize; tmp.height = targetSize;
+  const tctx = tmp.getContext('2d');
+  const size = targetSize;
+
+  // Detectar si es maskable por nombre
+  const maskable = filename.includes('maskable');
+  drawSeal(tctx, size, { maskable });
+
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = tmp.toDataURL('image/png');
+  link.click();
+}
+
+function renderPreviews(){
+  const c192 = document.getElementById('c192').getContext('2d');
+  drawSeal(c192, 192, { maskable:false });
+
+  const c512 = document.getElementById('c512').getContext('2d');
+  drawSeal(c512, 512, { maskable:false });
+
+  const cm  = document.getElementById('cmask').getContext('2d');
+  drawSeal(cm, 512, { maskable:true });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderPreviews();
+  document.getElementById('b192').addEventListener('click', () => downloadCanvasPNG(null, 'icon-192.png', 192));
+  document.getElementById('b512').addEventListener('click', () => downloadCanvasPNG(null, 'icon-512.png', 512));
+  document.getElementById('bmask').addEventListener('click', () => downloadCanvasPNG(null, 'maskable-512.png', 512));
+});
+</script>
+</body>
+</html>
