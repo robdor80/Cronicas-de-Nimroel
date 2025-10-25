@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Santuario de Nimroel — Terminal Arcana</title>
+
+  <!-- Estilos externos -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- ===== FONDO DE LLUVIA DE RUNAS ===== -->
+  <div id="runeRain" aria-hidden="true"></div>
+
+  <!-- ===== PORTAL DEL GRAN SELLO DE JORVIN ===== -->
+  <section id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" aria-describedby="gate-desc">
+    <div class="gate-card">
+      <h1 id="gate-title">Gran Sello de Jorvin activado</h1>
+      <p id="gate-desc">
+        Esta sesión está custodiada por la Cadena de Cronistas.<br>
+        Para acceder al <em>Terminal de Cristal</em>, active la runa.
+      </p>
+
+      <button class="rune-btn" id="gateBtn" aria-label="Activar la runa y acceder">
+        <!-- Runa / sello minimal en SVG -->
+        <svg viewBox="0 0 100 100" class="glow" aria-hidden="true">
+          <!-- anillo -->
+          <circle cx="50" cy="50" r="34" fill="none"
+                  stroke="url(#g)" stroke-width="4" />
+          <!-- ojo-runa -->
+          <path d="M20,50 Q50,30 80,50 Q50,70 20,50 Z" fill="none"
+                stroke="url(#g)" stroke-width="4" stroke-linecap="round" />
+          <circle cx="50" cy="50" r="5" fill="url(#g)" />
+
+          <!-- gradiente dorado -->
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0"  stop-color="#fff2b2"/>
+              <stop offset="1"  stop-color="#d6b663"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </button>
+
+      
+
+      <div class="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Canal seguro · Auditoría activa</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Script externo -->
+  <script src="script.js"></script>
+
+  <noscript>
+    <div style="position:fixed;inset:0;display:grid;place-items:center;background:#0e0f14;color:#ffe8a6;z-index:10000">
+      Esta Terminal requiere JavaScript habilitado.
+    </div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,18 @@
+/* Fuente ya la cargas por <link> a Google Fonts */
+.runa{
+  font-family: "Noto Sans Runic", serif;
+  letter-spacing: .18em;
+  color: #ffe99c;
+  text-shadow:
+    0 0 6px rgba(255, 240, 180, .85),
+    0 0 18px rgba(255, 210, 90, .45);
+  animation: glow 3.8s ease-in-out infinite;
+}
+@keyframes glow{
+  0%,100%{ text-shadow:
+    0 0 4px rgba(255,240,180,.55),
+    0 0 12px rgba(255,210,90,.28);}
+  50%{ text-shadow:
+    0 0 10px rgba(255,240,180,.95),
+    0 0 26px rgba(255,210,90,.55);}
+}

@@ -1,0 +1,194 @@
+/* ==========================================================
+   SANTUARIO DE NIMROEL · PORTAL DEL GRAN SELLO DE JORVIN
+   ========================================================== */
+
+/* -------- VARIABLES -------- */
+:root {
+  --gold: #f3d88a;
+  --gold-2: #c9b06a;
+  --ink: #0f1220;
+  --glass: rgba(180, 200, 255, 0.08);
+  --glass-stroke: rgba(255, 255, 255, 0.15);
+  --rune: #f7e6a4;
+  --glow1: rgba(247, 230, 164, 0.42);
+  --glow2: rgba(247, 230, 164, 0.22);
+  --bg-deep: #0a0b12;
+}
+
+/* -------- RESETEO BÁSICO -------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Cinzel", serif;
+  background: radial-gradient(900px 520px at 70% -10%, #171a2a 0%, #0e111c 55%, var(--bg-deep) 100%);
+  overflow: hidden;
+  color: #fff;
+}
+
+/* ==========================================================
+   FONDO DE LLUVIA DE RUNAS
+   ========================================================== */
+
+#runeRain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  filter: saturate(120%);
+}
+
+/* Cada columna de runas */
+.column {
+  position: absolute;
+  top: -120vh;
+  width: 1.4em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: fall var(--dur, 14s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+}
+@keyframes fall {
+  to { transform: translateY(220vh); }
+}
+
+/* Cada glifo (runa) */
+.glyph {
+  color: var(--rune);
+  font: 700 24px/1 "Noto Sans Runic", "Segoe UI Symbol", "Arial Unicode MS", "Symbola", serif;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 10px var(--glow1),
+    0 0 22px var(--glow2);
+  opacity: 0;
+  transform: translateY(-6px);
+  animation: glow 2.2s ease-in-out var(--gdelay, 0s) infinite;
+}
+@keyframes glow {
+  0%   { opacity: 0; filter: blur(0.6px); }
+  10%  { opacity: 0.75; filter: blur(0); }
+  50%  { opacity: 0.35; filter: blur(0.2px); }
+  100% { opacity: 0; filter: blur(0.6px); }
+}
+
+@media (max-width: 768px) {
+  .glyph { font-size: 26px; }
+}
+
+/* ==========================================================
+   PORTAL DEL SELLO
+   ========================================================== */
+
+#gate {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1200px 60% at 50% 20%, rgba(255, 230, 140, 0.06), transparent 60%),
+    radial-gradient(800px 50% at 50% 110%, rgba(255, 190, 80, 0.05), transparent 60%),
+    rgba(10, 12, 20, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9999;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+#gate.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Tarjeta central */
+.gate-card {
+  width: min(720px, 92vw);
+  padding: 28px 26px;
+  border-radius: 18px;
+  background: linear-gradient(to bottom, rgba(210, 230, 255, 0.06), rgba(140, 170, 255, 0.02));
+  border: 1px solid var(--glass-stroke);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: #e9eefc;
+  text-align: center;
+}
+
+.gate-card h1 {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+}
+
+.gate-card p {
+  margin: 0.35rem 0 0.75rem;
+  opacity: 0.9;
+  line-height: 1.5;
+  font-size: clamp(0.95rem, 1.7vw, 1.05rem);
+}
+
+/* -------- BOTÓN-RUNA -------- */
+.rune-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(55% 55% at 50% 45%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  outline: none;
+}
+.rune-btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.rune-btn:active { transform: translateY(0); filter: brightness(0.96); }
+.rune-btn svg { width: 64%; height: 64%; overflow: visible; }
+
+/* Brillo animado del sello */
+.glow {
+  filter: drop-shadow(0 0 10px rgba(243, 216, 138, 0.55))
+          drop-shadow(0 0 28px rgba(243, 216, 138, 0.35));
+  animation: pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
+/* Texto secundario */
+.hint {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin-top: 0.65rem;
+}
+
+/* Pie de sesión/verificación */
+.status {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+.status-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffeaa6, #d4b156);
+  box-shadow: 0 0 12px rgba(243, 216, 138, 0.65);
+}
+
+/* Accesibilidad */
+.rune-btn:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.25),
+    0 0 0 6px rgba(243, 216, 138, 0.35),
+    0 10px 30px rgba(0, 0, 0, 0.35);
+}
