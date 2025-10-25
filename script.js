@@ -244,9 +244,9 @@ async function unlockGate(){
   const gate = document.getElementById('gate');
   if(gate) gate.classList.add('hidden');
 
-  // Empieza la secuencia desde A (primer_canto)
-  scheduleAlternation('A');
+  document.body.classList.remove('lock-scroll'); // <- habilita scroll ya
 
+  scheduleAlternation('A');
   document.body.classList.add('crystal-awake');
 }
 
@@ -255,17 +255,16 @@ function initGate(){
   const btn  = document.getElementById('gateBtn');
   if(!gate || !btn) return;
 
+  // Bloquea scroll si el portal está activo
+  if(!gate.classList.contains('hidden')){
+    document.body.classList.add('lock-scroll');
+  }
+
   if(gateIsValid()){
     gate.classList.add('hidden');
-
-    // Intento directo
+    document.body.classList.remove('lock-scroll'); // <- no bloquees si ya está verificado
     scheduleAlternation('A');
-
-    // Si el contexto quedó "suspended" por recarga/autoplay,
-    // armamos bypass: en el primer gesto, reanudamos y arrancamos.
-    if(audioCtx && audioCtx.state !== 'running'){
-      armAutoplayBypass('A');
-    }
+    if(audioCtx && audioCtx.state !== 'running'){ armAutoplayBypass('A'); }
   }
 
   btn.addEventListener('click', unlockGate);
