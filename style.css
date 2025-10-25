@@ -424,3 +424,141 @@ body.crystal-awake #terminal {
   transform: scale(1);
 }
 
+
+
+/* ==========================================================
+   RESPONSIVE · PC / Tablet / Móvil (V & H)
+   ========================================================== */
+
+/* ===== Desktop grande (≥1440px) ===== */
+@media (min-width: 1440px) {
+  .terminal-head h2 { font-size: 2.2rem; }
+  .terminal-sub { font-size: 1.05rem; }
+  .cards {
+    max-width: 1400px;
+    gap: 2.2rem;
+  }
+  .card-glass {
+    padding: 2rem 1.6rem;
+    backdrop-filter: blur(20px) brightness(1.1);
+    -webkit-backdrop-filter: blur(20px) brightness(1.1);
+  }
+  .card-ico { width: 56px; height: 56px; }
+  .card-body h3 { font-size: 1.25rem; }
+}
+
+/* ===== Laptop / Desktop medio (1024–1439px) ===== */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 2rem;
+  }
+}
+
+/* ===== Tablet horizontal (≥900px y ≤1023px) ===== */
+@media (min-width: 900px) and (max-width: 1023px) and (orientation: landscape) {
+  .terminal-head { margin-top: 3.2rem; }
+  .terminal-head h2 { font-size: 1.9rem; }
+  .terminal-sub { font-size: .95rem; }
+  .cards {
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+    gap: 1.6rem;
+    padding: 2.2rem;
+  }
+  .card-glass {
+    padding: 1.6rem 1.1rem;
+    backdrop-filter: blur(16px) brightness(1.12);
+    -webkit-backdrop-filter: blur(16px) brightness(1.12);
+  }
+  .card-ico { width: 48px; height: 48px; }
+}
+
+/* ===== Tablet vertical (≤899px) ===== */
+@media (max-width: 899px) and (orientation: portrait) {
+  .terminal-head { margin-top: 2.8rem; }
+  .terminal-head h2 { font-size: 1.7rem; }
+  .terminal-sub { font-size: .9rem; }
+  .cards {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 1.4rem;
+    padding: 1.8rem;
+  }
+  .card-glass {
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    backdrop-filter: blur(14px) brightness(1.12);
+    -webkit-backdrop-filter: blur(14px) brightness(1.12);
+  }
+  .card-ico { width: 44px; height: 44px; }
+  .music-toggle { right: 18px; bottom: 18px; width: 48px; height: 48px; }
+}
+
+/* ===== Móvil horizontal (≤767px landscape) ===== */
+@media (max-width: 767px) and (orientation: landscape) {
+  .terminal-head { margin-top: 2rem; }
+  .terminal-head h2 { font-size: 1.4rem; }
+  .terminal-sub { font-size: .85rem; }
+  .cards {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+    gap: 1.1rem;
+    padding: 1.2rem;
+  }
+  .card-glass {
+    padding: 1.1rem .9rem;
+    border-radius: 12px;
+    backdrop-filter: blur(12px) brightness(1.1);
+    -webkit-backdrop-filter: blur(12px) brightness(1.1);
+  }
+  .card-ico { width: 40px; height: 40px; }
+  .card-body h3 { font-size: 1.05rem; }
+  .card-body p { font-size: .82rem; }
+  .music-toggle { right: 14px; bottom: 14px; width: 44px; height: 44px; }
+}
+
+/* ===== Móvil vertical (≤600px portrait) ===== */
+@media (max-width: 600px) and (orientation: portrait) {
+  .terminal-head { margin-top: 2.2rem; }
+  .terminal-head h2 { font-size: 1.35rem; }
+  .terminal-sub { font-size: .82rem; }
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .card-glass {
+    padding: 1.1rem .9rem;
+    border-radius: 12px;
+    background: rgba(185, 215, 255, 0.03); /* un pelín menos transparente para legibilidad */
+    border: 1px solid rgba(185, 215, 255, 0.2);
+    backdrop-filter: blur(12px) brightness(1.12);
+    -webkit-backdrop-filter: blur(12px) brightness(1.12);
+  }
+  .card-ico { width: 38px; height: 38px; }
+  .card-body h3 { font-size: 1.02rem; }
+  .card-body p { font-size: .8rem; }
+
+  /* Portal: tarjeta más compacta */
+  .gate-card {
+    padding: 1.4rem 1rem;
+    max-width: 92vw;
+  }
+  .rune-btn { width: 96px; height: 96px; }
+}
+
+/* ===== Ajustes globales para pantallas muy pequeñas (≤360px) ===== */
+@media (max-width: 360px) {
+  .terminal-head { margin-top: 1.6rem; }
+  .cards { padding: .8rem; gap: .8rem; }
+  .card-ico { width: 34px; height: 34px; }
+  .card-body p { font-size: .78rem; }
+  .music-toggle { right: 12px; bottom: 12px; width: 42px; height: 42px; }
+}
+
+/* ===== Detalle visual: tamaño de glifos en fondo (legibilidad) ===== */
+@media (max-width: 900px) {
+  .glyph { font-size: 22px; }
+}
+@media (max-width: 600px) {
+  .glyph { font-size: 20px; }
+}
+
