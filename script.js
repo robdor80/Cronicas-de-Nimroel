@@ -401,3 +401,64 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 })();
 
+/* ==========================================================
+   TOGGLE MÚSICA (ARPA) — ON/OFF por ganancia global
+   ========================================================== */
+(function musicToggle(){
+  const btn = document.getElementById('musicToggle');
+  if(!btn) return;
+
+  // Debe coincidir con el volumen "ON" que pones en setupAudio()
+  const TARGET_GAIN = 0.55;
+
+  let muted = false;
+  let pending = false; // si el usuario pulsa antes de que masterGain exista
+
+  function applyVolume() {
+    if(!audioCtx || !masterGain) return;
+    const t = audioCtx.currentTime + 0.05;
+    const dest = muted ? 0.0 : TARGET_GAIN;
+
+    try {
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+      masterGain.gain.linearRampToValueAtTime(dest, t + 0.35);
+    } catch(e) {}
+  }
+
+  // Si todavía no hay masterGain, esperamos a que aparezca
+  const waiter = setInterval(() => {
+    if(typeof masterGain !== 'undefined' && masterGain){
+      clearInterval(waiter);
+      if(pending) { applyVolume(); pending = false; }
+      // Sincroniza el estado visual del botón con el volumen real
+      const gv = (masterGain.gain && typeof masterGain.gain.value === 'number') ? masterGain.gain.value : TARGET_GAIN;
+      muted = gv < 0.05;
+      btn.classList.toggle('off', muted);
+    }
+  }, 120);
+
+  btn.addEventListener('click', ()=>{
+    // Alterna estado
+    muted = !muted;
+    btn.classList.toggle('off', muted);
+
+    if(masterGain){
+      applyVolume();
+    }else{
+      // Aún no está listo; aplica cuando esté
+      pending = true;
+    }
+  });
+
+  // Si la música arranca más tarde (por desbloqueo/recarga), vuelve a aplicar el estado del toggle
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible' && masterGain){
+      // re-aplica volumen por si el contexto cambió estado
+      applyVolume();
+      btn.classList.toggle('off', muted);
+    }
+  });
+})();
+
+
