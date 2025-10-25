@@ -16,20 +16,15 @@
 }
 
 /* -------- RESETEO BÁSICO + SCROLL CORRECTO -------- */
-* {
-  box-sizing: border-box;
-  margin: 0; padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  height: auto;
-}
+html { height: auto; }
 
 body {
-  min-height: 100dvh;            /* ocupa alto real de la ventana */
-  height: auto;                  /* permite crecer con el contenido */
-  overflow-x: hidden;            /* sin scroll horizontal */
-  overflow-y: auto;              /* scroll vertical habilitado */
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   color: #fff;
   font-family: "Cinzel", serif;
@@ -42,11 +37,10 @@ body.lock-scroll { overflow: hidden; }
 /* ==========================================================
    FONDO DE LLUVIA DE RUNAS
    ========================================================== */
-
 #runeRain {
   position: fixed;
   inset: 0;
-  z-index: 0;                    /* fondo real, por debajo del resto */
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
   filter: saturate(120%);
@@ -89,9 +83,8 @@ body.lock-scroll { overflow: hidden; }
 @media (max-width: 600px){ .glyph { font-size: 20px; } }
 
 /* ==========================================================
-   PORTAL DEL SELLO (UNA SOLA DEFINICIÓN)
+   PORTAL DEL SELLO
    ========================================================== */
-
 #gate {
   position: fixed;
   inset: 0;
@@ -106,9 +99,7 @@ body.lock-scroll { overflow: hidden; }
   -webkit-backdrop-filter: blur(6px);
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
-#gate.hidden {
-  opacity: 0; visibility: hidden; pointer-events: none;
-}
+#gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
 /* Tarjeta central */
 .gate-card {
@@ -136,7 +127,7 @@ body.lock-scroll { overflow: hidden; }
   font-size: clamp(0.95rem, 1.7vw, 1.05rem);
 }
 
-/* -------- BOTÓN-RUNA -------- */
+/* Botón-runa */
 .rune-btn {
   display: inline-grid;
   place-items: center;
@@ -156,7 +147,7 @@ body.lock-scroll { overflow: hidden; }
 .rune-btn:active { transform: translateY(0);   filter: brightness(0.96); }
 .rune-btn svg { width: 64%; height: 64%; overflow: visible; }
 
-/* Brillo animado del sello */
+/* Brillo animado */
 .glow {
   filter: drop-shadow(0 0 10px rgba(243, 216, 138, 0.55))
           drop-shadow(0 0 28px rgba(243, 216, 138, 0.35));
@@ -187,14 +178,8 @@ body.lock-scroll { overflow: hidden; }
 /* ==========================================================
    SANTUARIO · Terminal de Cristal (Tarjetas de acceso)
    ========================================================== */
+body { color: #dfe8ff; font-family: "Cinzel", "Segoe UI", serif; }
 
-/* FONDO GENERAL de la zona de terminal (sobre runas) */
-body {
-  color: #dfe8ff;
-  font-family: "Cinzel", "Segoe UI", serif;
-}
-
-/* ========== TERMINAL DE CRISTAL ========== */
 #terminal {
   position: relative;
   z-index: 1;
@@ -204,12 +189,9 @@ body {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 1.5s ease, transform 1.5s ease;
-  padding-bottom: 10dvh;        /* deja aire al final para scroll */
+  padding-bottom: 10dvh;
 }
-body.crystal-awake #terminal {
-  opacity: 1;
-  transform: translateY(0);
-}
+body.crystal-awake #terminal { opacity: 1; transform: translateY(0); }
 
 .terminal-head { margin-top: 4rem; }
 .terminal-head h2 {
@@ -218,13 +200,9 @@ body.crystal-awake #terminal {
   color: #bcd6ff;
   text-shadow: 0 0 15px rgba(180, 220, 255, 0.25);
 }
-.terminal-sub {
-  font-size: 0.95rem;
-  color: #93a5c8;
-  margin-top: 0.4rem;
-}
+.terminal-sub { font-size: 0.95rem; color: #93a5c8; margin-top: 0.4rem; }
 
-/* === TARJETAS DE CRISTAL === */
+/* Tarjetas */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -233,12 +211,11 @@ body.crystal-awake #terminal {
   max-width: 1200px;
   width: 100%;
 }
-
 .card-glass {
   position: relative;
   text-decoration: none;
   color: #e7f1ff;
-  background: rgba(180, 210, 255, 0.02); /* 98% transparente */
+  background: rgba(180, 210, 255, 0.02);
   border: 1px solid rgba(180, 210, 255, 0.18);
   border-radius: 14px;
   padding: 1.8rem 1.2rem;
@@ -248,56 +225,30 @@ body.crystal-awake #terminal {
   box-shadow: 0 0 25px rgba(150, 200, 255, 0.08);
   transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
 }
-
-/* Reflejo diagonal muy leve */
 .card-glass::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.02) 60%
-  );
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 60%);
   mix-blend-mode: screen;
   pointer-events: none;
 }
-
 .card-glass:hover {
   transform: translateY(-6px);
   border-color: rgba(180, 220, 255, 0.4);
   box-shadow: 0 0 35px rgba(170, 230, 255, 0.18);
 }
-
-/* ICONOS */
-.card-ico {
-  width: 48px; height: 48px;
-  margin: 0 auto 1rem;
-}
-.card-ico svg {
-  width: 100%; height: 100%;
-  stroke: #cde7ff; stroke-width: 1.6; fill: none;
-}
-
-/* TEXTO */
-.card-body h3 {
-  font-size: 1.2rem;
-  color: #eaf2ff;
-  margin-bottom: 0.3rem;
-  letter-spacing: 0.03em;
-}
-.card-body p {
-  font-size: 0.9rem;
-  color: #a8bde2;
-}
+.card-ico { width: 48px; height: 48px; margin: 0 auto 1rem; }
+.card-ico svg { width: 100%; height: 100%; stroke: #cde7ff; stroke-width: 1.6; fill: none; }
+.card-body h3 { font-size: 1.2rem; color: #eaf2ff; margin-bottom: 0.3rem; letter-spacing: 0.03em; }
+.card-body p  { font-size: 0.9rem; color: #a8bde2; }
 
 /* ==========================================================
    BOTÓN MÚSICA (ARPA)
    ========================================================== */
 .music-toggle {
   position: fixed;
-  bottom: 20px;
-  right: 22px;
+  bottom: 20px; right: 22px;
   z-index: 20;
   width: 50px; height: 50px;
   border: none; border-radius: 50%;
@@ -311,119 +262,71 @@ body.crystal-awake #terminal {
   transition: all 0.35s ease;
 }
 .music-toggle svg { width: 28px; height: 28px; pointer-events: none; }
-.music-toggle:hover {
-  color: #fff8d0; transform: scale(1.08);
-  box-shadow: 0 0 18px rgba(200,230,255,0.5);
-}
-.music-toggle.off {
-  opacity: 0.6; color: #6d7c91; box-shadow: 0 0 6px rgba(90,100,120,0.3);
-}
+.music-toggle:hover { color: #fff8d0; transform: scale(1.08); box-shadow: 0 0 18px rgba(200,230,255,0.5); }
+.music-toggle.off { opacity: 0.6; color: #6d7c91; box-shadow: 0 0 6px rgba(90,100,120,0.3); }
 .music-toggle.off:hover { color: #9aa6b5; transform: scale(1); }
 
 /* ==========================================================
-   RESPONSIVE · PC / Tablet / Móvil (V & H)
+   RESPONSIVE
    ========================================================== */
-
-/* ===== Desktop grande (≥1440px) ===== */
+/* Desktop grande */
 @media (min-width: 1440px) {
   .terminal-head h2 { font-size: 2.2rem; }
   .terminal-sub { font-size: 1.05rem; }
   .cards { max-width: 1400px; gap: 2.2rem; }
-  .card-glass {
-    padding: 2rem 1.6rem;
-    backdrop-filter: blur(20px) brightness(1.1);
-    -webkit-backdrop-filter: blur(20px) brightness(1.1);
-  }
+  .card-glass { padding: 2rem 1.6rem; backdrop-filter: blur(20px) brightness(1.1); -webkit-backdrop-filter: blur(20px) brightness(1.1); }
   .card-ico { width: 56px; height: 56px; }
   .card-body h3 { font-size: 1.25rem; }
 }
-
-/* ===== Laptop / Desktop medio (1024–1439px) ===== */
+/* Laptop / Desktop medio */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .cards { grid-template-columns: repeat(3, minmax(260px, 1fr)); gap: 2rem; }
 }
-
-/* ===== Tablet horizontal (≥900px y ≤1023px) ===== */
+/* Tablet horizontal */
 @media (min-width: 900px) and (max-width: 1023px) and (orientation: landscape) {
   .terminal-head { margin-top: 3.2rem; }
   .terminal-head h2 { font-size: 1.9rem; }
   .terminal-sub { font-size: .95rem; }
-  .cards {
-    grid-template-columns: repeat(3, minmax(240px, 1fr));
-    gap: 1.6rem; padding: 2.2rem;
-  }
-  .card-glass {
-    padding: 1.6rem 1.1rem;
-    backdrop-filter: blur(16px) brightness(1.12);
-    -webkit-backdrop-filter: blur(16px) brightness(1.12);
-  }
+  .cards { grid-template-columns: repeat(3, minmax(240px, 1fr)); gap: 1.6rem; padding: 2.2rem; }
+  .card-glass { padding: 1.6rem 1.1rem; backdrop-filter: blur(16px) brightness(1.12); -webkit-backdrop-filter: blur(16px) brightness(1.12); }
   .card-ico { width: 48px; height: 48px; }
 }
-
-/* ===== Tablet vertical (≤899px) ===== */
+/* Tablet vertical */
 @media (max-width: 899px) and (orientation: portrait) {
   .terminal-head { margin-top: 2.8rem; }
   .terminal-head h2 { font-size: 1.7rem; }
   .terminal-sub { font-size: .9rem; }
-  .cards {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-    gap: 1.4rem; padding: 1.8rem;
-  }
-  .card-glass {
-    padding: 1.5rem 1rem; border-radius: 12px;
-    backdrop-filter: blur(14px) brightness(1.12);
-    -webkit-backdrop-filter: blur(14px) brightness(1.12);
-  }
+  .cards { grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1.4rem; padding: 1.8rem; }
+  .card-glass { padding: 1.5rem 1rem; border-radius: 12px; backdrop-filter: blur(14px) brightness(1.12); -webkit-backdrop-filter: blur(14px) brightness(1.12); }
   .card-ico { width: 44px; height: 44px; }
   .music-toggle { right: 18px; bottom: 18px; width: 48px; height: 48px; }
 }
-
-/* ===== Móvil horizontal (≤767px landscape) ===== */
+/* Móvil horizontal */
 @media (max-width: 767px) and (orientation: landscape) {
   .terminal-head { margin-top: 2rem; }
   .terminal-head h2 { font-size: 1.4rem; }
   .terminal-sub { font-size: .85rem; }
-  .cards {
-    grid-template-columns: repeat(2, minmax(200px, 1fr));
-    gap: 1.1rem; padding: 1.2rem;
-  }
-  .card-glass {
-    padding: 1.1rem .9rem; border-radius: 12px;
-    backdrop-filter: blur(12px) brightness(1.1);
-    -webkit-backdrop-filter: blur(12px) brightness(1.1);
-  }
+  .cards { grid-template-columns: repeat(2, minmax(200px, 1fr)); gap: 1.1rem; padding: 1.2rem; }
+  .card-glass { padding: 1.1rem .9rem; border-radius: 12px; backdrop-filter: blur(12px) brightness(1.1); -webkit-backdrop-filter: blur(12px) brightness(1.1); }
   .card-ico { width: 40px; height: 40px; }
   .card-body h3 { font-size: 1.05rem; }
   .card-body p { font-size: .82rem; }
   .music-toggle { right: 14px; bottom: 14px; width: 44px; height: 44px; }
 }
-
-/* ===== Móvil vertical (≤600px portrait) ===== */
+/* Móvil vertical */
 @media (max-width: 600px) and (orientation: portrait) {
   .terminal-head { margin-top: 2.2rem; }
   .terminal-head h2 { font-size: 1.35rem; }
   .terminal-sub { font-size: .82rem; }
-  .cards {
-    grid-template-columns: 1fr;
-    gap: 1rem; padding: 1rem;
-  }
-  .card-glass {
-    padding: 1.1rem .9rem; border-radius: 12px;
-    background: rgba(185, 215, 255, 0.03); /* ligera mejora legibilidad */
-    border: 1px solid rgba(185, 215, 255, 0.2);
-    backdrop-filter: blur(12px) brightness(1.12);
-    -webkit-backdrop-filter: blur(12px) brightness(1.12);
-  }
+  .cards { grid-template-columns: 1fr; gap: 1rem; padding: 1rem; }
+  .card-glass { padding: 1.1rem .9rem; border-radius: 12px; background: rgba(185, 215, 255, 0.03); border: 1px solid rgba(185, 215, 255, 0.2); backdrop-filter: blur(12px) brightness(1.12); -webkit-backdrop-filter: blur(12px) brightness(1.12); }
   .card-ico { width: 38px; height: 38px; }
   .card-body h3 { font-size: 1.02rem; }
   .card-body p { font-size: .8rem; }
-
-  /* Portal: tarjeta más compacta */
   .gate-card { padding: 1.4rem 1rem; max-width: 92vw; }
   .rune-btn { width: 96px; height: 96px; }
 }
-
-/* ===== Pantallas muy pequeñas (≤360px) ===== */
+/* Muy pequeñas */
 @media (max-width: 360px) {
   .terminal-head { margin-top: 1.6rem; }
   .cards { padding: .8rem; gap: .8rem; }
@@ -431,112 +334,3 @@ body.crystal-awake #terminal {
   .card-body p { font-size: .78rem; }
   .music-toggle { right: 12px; bottom: 12px; width: 42px; height: 42px; }
 }
-
-/* ===== Botón Instalar (PWA) — estilo cristal ===== */
-#pwa-install {
-  position: fixed;
-  left: max(12px, env(safe-area-inset-left));
-  bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 50;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 10px 14px;
-  border-radius: 14px;
-
-  /* reset de botón nativo */
-  border: 1px solid rgba(185, 215, 255, 0.25);
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  background: rgba(185, 215, 255, 0.08);
-  color: #eaf2ff;
-  font: 600 14px/1.1 "Cinzel", serif;
-  letter-spacing: .02em;
-  cursor: pointer;
-
-  /* cristal */
-  backdrop-filter: blur(10px) brightness(1.08);
-  -webkit-backdrop-filter: blur(10px) brightness(1.08);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease, opacity .2s ease;
-}
-
-#pwa-install:hover {
-  transform: translateY(-1px);
-  border-color: rgba(200, 230, 255, 0.45);
-  background: rgba(195, 225, 255, 0.12);
-  box-shadow:
-    0 10px 28px rgba(0, 0, 0, 0.4),
-    0 0 18px rgba(200,230,255,0.25);
-}
-
-#pwa-install:active {
-  transform: translateY(0);
-  background: rgba(175, 210, 255, 0.12);
-}
-
-/* icono */
-#pwa-install svg {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
-  stroke: currentColor;
-  stroke-width: 2;
-  fill: none;
-}
-
-/* estados */
-#pwa-install[hidden] { display: none !important; }
-#pwa-install.disabled {
-  opacity: .6;
-  pointer-events: none;
-}
-
-/* responsive */
-@media (max-width: 420px) {
-  #pwa-install { padding: 9px 12px; gap: 6px; border-radius: 12px; }
-  #pwa-install svg { width: 17px; height: 17px; }
-  #pwa-install span { font-size: 13px; }
-}
-@media (max-width: 360px) {
-  #pwa-install { padding: 8px 10px; }
-  #pwa-install span { display: none; } /* deja solo el icono si el espacio es mínimo */
-}
-
-
-
-.install-btn.disabled { opacity:.6; cursor:default; }
-
-/* Botón PWA personalizado */
-.install-cta {
-  position: fixed;
-  left: 14px;
-  bottom: 14px;
-  z-index: 40;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  font: 600 14px/1 "Cinzel", serif;
-  color: #f3e8b0;
-  background: radial-gradient(circle at 40% 30%, rgba(255,255,255,.14), rgba(180,210,255,.04))
-              ,rgba(10,16,28,.42);
-  border: 1px solid rgba(200,220,255,.25);
-  border-radius: 12px;
-  box-shadow: 0 6px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
-  backdrop-filter: blur(10px) brightness(1.06);
-  -webkit-backdrop-filter: blur(10px) brightness(1.06);
-  cursor: pointer;
-  transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
-}
-.install-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,.45); }
-.install-cta:active { transform: translateY(0); }
-.install-cta.hidden { display: none; }
-.install-cta svg { color: #f3d88a; filter: drop-shadow(0 0 6px rgba(243,216,138,.35)); }
-
-

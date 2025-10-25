@@ -138,7 +138,6 @@ function scheduleAlternation(startWith = 'A'){
     programNextCrossfade();
   };
 
-  // Reanuda el contexto si está suspendido
   audioCtx.resume().then(startNow).catch(()=>{
     // si falla (autoplay), lo intentaremos tras un gesto del usuario
   });
@@ -160,7 +159,6 @@ function programNextCrossfade(){
   const startNext = () => {
     try {
       nextUp.source.start(crossTime);
-      // crossfade
       current.gain.gain.setValueAtTime(current.gain.gain.value, crossTime);
       current.gain.gain.linearRampToValueAtTime(0, crossTime + FADE);
 
@@ -185,7 +183,7 @@ function programNextCrossfade(){
   timers.push(setTimeout(swapAndContinue, msToSwap));
 }
 
-/* Detiene solo música (mantiene contexto por si reanudamos) */
+/* Detiene solo música */
 function stopMusicOnly(){
   try{
     if(current){
@@ -219,13 +217,11 @@ function armAutoplayBypass(startLabel = 'A'){
   armedAutoplayFix = true;
 
   const kick = () => {
-    // reanuda contexto y lanza la alternancia
     if(audioCtx && audioCtx.state !== 'running'){
       audioCtx.resume().catch(()=>{});
     }
     scheduleAlternation(startLabel);
 
-    // limpiar escuchas
     document.removeEventListener('pointerdown', kick);
     document.removeEventListener('keydown', kick);
     document.removeEventListener('touchstart', kick);
@@ -244,7 +240,7 @@ async function unlockGate(){
   const gate = document.getElementById('gate');
   if(gate) gate.classList.add('hidden');
 
-  document.body.classList.remove('lock-scroll'); // <- habilita scroll ya
+  document.body.classList.remove('lock-scroll');
 
   scheduleAlternation('A');
   document.body.classList.add('crystal-awake');
@@ -255,14 +251,13 @@ function initGate(){
   const btn  = document.getElementById('gateBtn');
   if(!gate || !btn) return;
 
-  // Bloquea scroll si el portal está activo
   if(!gate.classList.contains('hidden')){
     document.body.classList.add('lock-scroll');
   }
 
   if(gateIsValid()){
     gate.classList.add('hidden');
-    document.body.classList.remove('lock-scroll'); // <- no bloquees si ya está verificado
+    document.body.classList.remove('lock-scroll');
     scheduleAlternation('A');
     if(audioCtx && audioCtx.state !== 'running'){ armAutoplayBypass('A'); }
   }
@@ -287,14 +282,12 @@ window.addEventListener('beforeunload', stopBgAudio);
 /* ---------- INICIO ---------- */
 window.addEventListener('DOMContentLoaded', async () => {
   initRuneRain();
-  await setupAudio();   // decodifica A y B
-  initGate();           // si la sesión es válida, intenta arrancar A→B (con bypass gestual si hace falta)
+  await setupAudio();
+  initGate();
 });
-
 
 /* ==========================================================
    TARJETAS DE CRISTAL · Revelado, flotación y parallax
-   (pegar al final de script.js)
    ========================================================== */
 (function cardsFX(){
   const terminal   = document.getElementById('terminal');
@@ -306,16 +299,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   let revealed = false;
   let rafId = null;
 
-  // --- 1) Revelado escalonado cuando body gana 'crystal-awake'
   function revealCards(){
     if(revealed) return;
     revealed = true;
-    const baseDelay = 100; // ms entre tarjeta y tarjeta
+    const baseDelay = 100;
     cards.forEach((card, i) => {
       card.style.opacity = '0';
       card.style.transform = 'translateY(16px) scale(0.98)';
       card.style.transition = 'opacity .7s ease, transform .7s ease, box-shadow .3s ease';
-
       setTimeout(()=>{
         card.style.opacity = '1';
         card.style.transform = 'translateY(0) scale(1)';
@@ -323,7 +314,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Observa el body para saber cuándo aparece 'crystal-awake' (sin tocar tu código existente)
   const mo = new MutationObserver(() => {
     if(document.body.classList.contains('crystal-awake')){
       revealCards();
@@ -332,55 +322,44 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
   mo.observe(document.documentElement, { attributes:true, subtree:true, attributeFilter:['class'] });
 
-  // Si ya está activa al cargar (sesión recordada), dispara también
   if(document.body.classList.contains('crystal-awake')) {
     revealCards();
     mo.disconnect();
   }
 
-  // --- 2) Flotación suave (idle bobbing) + 3) Parallax con el ratón
-  const floats = cards.map((card, i) => ({
+  const floats = cards.map((card) => ({
     el: card,
     seed: Math.random() * Math.PI * 2,
-    amp: 2 + Math.random() * 2,       // amplitud en px
-    speed: 0.4 + Math.random() * 0.5, // velocidad
-    baseX: 0,
-    baseY: 0,
+    amp: 2 + Math.random() * 2,
+    speed: 0.4 + Math.random() * 0.5,
     parX: 0,
     parY: 0
   }));
 
-  // Parallax solo desktop
   let targetParX = 0, targetParY = 0;
   const desktop = matchMedia('(pointer:fine)').matches;
   if(desktop){
     window.addEventListener('mousemove', (e)=>{
       const cx = window.innerWidth  * 0.5;
       const cy = window.innerHeight * 0.5;
-      const dx = (e.clientX - cx) / cx;   // -1 .. 1
-      const dy = (e.clientY - cy) / cy;   // -1 .. 1
-      // máx ~6px lateral, ~4px vertical
+      const dx = (e.clientX - cx) / cx;
+      const dy = (e.clientY - cy) / cy;
       targetParX = dx * 6;
       targetParY = dy * 4;
     });
   }
 
   function tick(t){
-    floats.forEach((f, i) => {
-      // easing hacia el objetivo de parallax (suave)
+    floats.forEach((f) => {
       f.parX += (targetParX - f.parX) * 0.06;
       f.parY += (targetParY - f.parY) * 0.06;
-
-      // flotación sinusoidal individual
       const y = Math.sin((t/1000) * f.speed + f.seed) * f.amp;
       const x = Math.cos((t/1100) * (f.speed*0.85) + f.seed) * (f.amp * 0.35);
-
       f.el.style.transform = `translate3d(${(x + f.parX).toFixed(2)}px, ${(y + f.parY).toFixed(2)}px, 0)`;
     });
     rafId = requestAnimationFrame(tick);
   }
 
-  // Arranca animaciones cuando el terminal esté visible
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
@@ -392,7 +371,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   }, { threshold: 0.05 });
   io.observe(terminal);
 
-  // Limpieza al salir de la página
   window.addEventListener('pagehide', ()=>{
     if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
     io.disconnect();
@@ -407,17 +385,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   const btn = document.getElementById('musicToggle');
   if(!btn) return;
 
-  // Debe coincidir con el volumen "ON" que pones en setupAudio()
   const TARGET_GAIN = 0.55;
 
   let muted = false;
-  let pending = false; // si el usuario pulsa antes de que masterGain exista
+  let pending = false;
 
   function applyVolume() {
     if(!audioCtx || !masterGain) return;
     const t = audioCtx.currentTime + 0.05;
     const dest = muted ? 0.0 : TARGET_GAIN;
-
     try {
       masterGain.gain.cancelScheduledValues(t);
       masterGain.gain.setValueAtTime(masterGain.gain.value, t);
@@ -425,12 +401,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch(e) {}
   }
 
-  // Si todavía no hay masterGain, esperamos a que aparezca
   const waiter = setInterval(() => {
     if(typeof masterGain !== 'undefined' && masterGain){
       clearInterval(waiter);
       if(pending) { applyVolume(); pending = false; }
-      // Sincroniza el estado visual del botón con el volumen real
       const gv = (masterGain.gain && typeof masterGain.gain.value === 'number') ? masterGain.gain.value : TARGET_GAIN;
       muted = gv < 0.05;
       btn.classList.toggle('off', muted);
@@ -438,67 +412,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   }, 120);
 
   btn.addEventListener('click', ()=>{
-    // Alterna estado
     muted = !muted;
     btn.classList.toggle('off', muted);
-
-    if(masterGain){
-      applyVolume();
-    }else{
-      // Aún no está listo; aplica cuando esté
-      pending = true;
-    }
+    if(masterGain){ applyVolume(); } else { pending = true; }
   });
 
-  // Si la música arranca más tarde (por desbloqueo/recarga), vuelve a aplicar el estado del toggle
   document.addEventListener('visibilitychange', ()=>{
     if(document.visibilityState === 'visible' && masterGain){
-      // re-aplica volumen por si el contexto cambió estado
       applyVolume();
       btn.classList.toggle('off', muted);
     }
   });
 })();
-
-
-// ---------------- PWA Install (captura consistente) ----------------
-let deferredPrompt = null;
-const installBtn = document.getElementById('pwaInstall');
-
-// Registrar el listener lo antes posible
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Evita la mini-infobar de Chrome
-  e.preventDefault();
-  deferredPrompt = e;
-  // Muestra tu botón
-  installBtn?.classList.remove('hidden');
-}, { once: true });
-
-// Al pulsar tu botón, muestra el prompt nativo
-installBtn?.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  installBtn.disabled = true;
-  try {
-    const choice = await deferredPrompt.prompt();
-    // Opcional: choice.outcome => 'accepted' | 'dismissed'
-  } catch (_) {
-    // Ignora
-  } finally {
-    deferredPrompt = null;
-    installBtn.classList.add('hidden');
-    installBtn.disabled = false;
-  }
-});
-
-// Si ya está instalada, oculta el botón
-function hideIfStandalone() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                    || window.navigator.standalone === true; // iOS
-  if (isStandalone) installBtn?.classList.add('hidden');
-}
-hideIfStandalone();
-
-// También ocúltalo cuando se complete la instalación
-window.addEventListener('appinstalled', () => {
-  installBtn?.classList.add('hidden');
-});

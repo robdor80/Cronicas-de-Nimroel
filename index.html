@@ -4,15 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Santuario de Nimroel — Terminal Arcana</title>
-  <!-- PWA: manifest + color de tema -->
-<link rel="manifest" href="/Cronicas-de-Nimroel/manifest.webmanifest">
-<meta name="theme-color" content="#0a0b12">
 
-<!-- iOS (instalación manual: Compartir → Añadir a pantalla de inicio) -->
-<link rel="apple-touch-icon" href="/Cronicas-de-Nimroel/medios/icons/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Santuario">
+  <!-- PWA básico (lo dejo porque no molesta y te da icono + SW) -->
+  <link rel="manifest" href="/Cronicas-de-Nimroel/manifest.webmanifest">
+  <meta name="theme-color" content="#0a0b12">
+  <link rel="apple-touch-icon" href="/Cronicas-de-Nimroel/medios/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Santuario">
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -64,7 +63,6 @@
       <!-- Crónicas -->
       <a class="card-glass" href="paginas/cronicas/index.html">
         <div class="card-ico" aria-hidden="true">
-          <!-- icono libro -->
           <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v13a2 2 0 0 1-2 2H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zM7 5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h9V6a1 1 0 0 0-1-1H7z"/></svg>
         </div>
         <div class="card-body">
@@ -76,7 +74,6 @@
       <!-- Magia -->
       <a class="card-glass" href="paginas/magia/index.html">
         <div class="card-ico" aria-hidden="true">
-          <!-- icono varita -->
           <svg viewBox="0 0 24 24"><path d="M3 21l7-7m1-8l-1 3 3-1 1-3-3 1zm8 8l-1 3 3-1 1-3-3 1zM11 13l7-7a2 2 0 0 1 3 3l-7 7"/></svg>
         </div>
         <div class="card-body">
@@ -88,7 +85,6 @@
       <!-- Mapas -->
       <a class="card-glass" href="paginas/mapas/index.html">
         <div class="card-ico" aria-hidden="true">
-          <!-- icono mapa -->
           <svg viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v18l-6 2-6-2-6 2V5l6-2zM9 3v18M15 5v18"/></svg>
         </div>
         <div class="card-body">
@@ -100,7 +96,6 @@
       <!-- Personajes -->
       <a class="card-glass" href="paginas/personajes/index.html">
         <div class="card-ico" aria-hidden="true">
-          <!-- icono persona -->
           <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-9 9a9 9 0 1 1 18 0"/></svg>
         </div>
         <div class="card-body">
@@ -112,7 +107,6 @@
       <!-- Razas -->
       <a class="card-glass" href="paginas/razas/index.html">
         <div class="card-ico" aria-hidden="true">
-          <!-- icono árbol de vida -->
           <svg viewBox="0 0 24 24"><path d="M12 2v6m0 0c3 0 5 2 5 5s-2 5-5 5-5-2-5-5 2-5 5-5zm0 10v4"/></svg>
         </div>
         <div class="card-body">
@@ -124,11 +118,11 @@
       <!-- Línea temporal -->
       <a class="card-glass" href="paginas/linea_temporal/index.html">
         <div class="card-ico" aria-hidden="true">
-          <!-- icono tiempo -->
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path d="M6 2h12M6 22h12M8 2v4a4 4 0 0 0 1.2 2.8L12 12l2.8-3.2A4 4 0 0 0 16 6V2M8 22v-4a4 4 0 0 1 1.2-2.8L12 12l2.8 3.2A4 4 0 0 1 16 18v4"
-        fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+          <!-- Reloj de arena -->
+          <svg viewBox="0 0 24 24">
+            <path d="M6 2h12M6 22h12M8 2v4a4 4 0 0 0 1.2 2.8L12 12l2.8-3.2A4 4 0 0 0 16 6V2M8 22v-4a4 4 0 0 1 1.2-2.8L12 12l2.8 3.2A4 4 0 0 1 16 18v4"
+                  fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
         <div class="card-body">
           <h3>Línea temporal</h3>
@@ -139,27 +133,14 @@
   </main>
 
   <!-- Toggle de Música (arpa) -->
-<button id="musicToggle" class="music-toggle" aria-label="Alternar música">
-  <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 60h4l40-55h-4L10 60zm0 0v-6h44v6H10z" 
-          stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
-    <path d="M18 52V20m6 38V25m6 37V30m6 32V35m6 27V40m6 22V45" 
-          stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-  </svg>
-</button>
-
-<!-- Botón “Instalar app” (PWA) -->
-<button id="pwa-install" class="install-btn" aria-label="Instalar aplicación">
-  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-    <path d="M12 3v10m0 0l4-4m-4 4l-4-4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
-          stroke="currentColor" stroke-width="2" fill="none"
-          stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <span>Instalar</span>
-</button>
-
-
-
+  <button id="musicToggle" class="music-toggle" aria-label="Alternar música">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 60h4l40-55h-4L10 60zm0 0v-6h44v6H10z"
+            stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <path d="M18 52V20m6 38V25m6 37V30m6 32V35m6 27V40m6 22V45"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
 
   <script src="script.js"></script>
 
@@ -169,26 +150,14 @@
     </div>
   </noscript>
 
+  <!-- Registro de Service Worker (puedes dejarlo) -->
   <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/Cronicas-de-Nimroel/service-worker.js")
-        .catch(err => console.warn("SW registration failed:", err));
-    });
-  }
-</script>
-
-<!-- Botón PWA personalizado (oculto por defecto) -->
-<button id="pwaInstall" class="install-cta hidden" aria-label="Instalar la app">
-  <!-- icono descarga/instalar -->
-  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-    <path d="M12 3v10m0 0l4-4m-4 4l-4-4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
-          fill="none" stroke="currentColor" stroke-width="1.8"
-          stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <span>Instalar</span>
-</button>
-
-
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/Cronicas-de-Nimroel/service-worker.js")
+          .catch(err => console.warn("SW registration failed:", err));
+      });
+    }
+  </script>
 </body>
 </html>
