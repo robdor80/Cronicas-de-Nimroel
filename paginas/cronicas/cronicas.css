@@ -326,3 +326,125 @@ html, body {
   .field select { width: 100%; }
   .grid.custodios, .grid.cronicas { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================
+   UNIFICACIÓN VISUAL CON EL PORTAL PRINCIPAL (index.html)
+   ========================================================== */
+
+/* ----- Cabecera principal ("Crónicas del Santuario") ----- */
+header.page-head,
+.crumbs {
+  text-align: center;
+  margin: 4rem auto 2rem;
+  max-width: 900px;
+  padding: 0 1.5rem;
+}
+
+.crumbs h1,
+header.page-head h1 {
+  font-family: "Cinzel", serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: #bcd6ff; /* mismo azul brillante de la Terminal */
+  text-shadow: 0 0 18px rgba(180, 220, 255, 0.35);
+  margin-bottom: 0.4rem;
+}
+
+.crumbs .subtitle,
+header.page-head p {
+  font-size: 1rem;
+  color: #93a5c8;
+  opacity: 0.9;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+/* ----- Barra de búsqueda y filtros ----- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.2rem auto 2rem;
+  padding: 0 1.5rem;
+  max-width: 960px;
+}
+
+.searchbox input[type="search"],
+.field select {
+  color: #eaf2ff;
+  font-family: "Cinzel", serif;
+  background: rgba(180, 210, 255, 0.06);
+  border: 1px solid rgba(180, 210, 255, 0.18);
+  border-radius: 12px;
+  backdrop-filter: blur(12px) brightness(1.1);
+  -webkit-backdrop-filter: blur(12px) brightness(1.1);
+  padding: 10px 14px;
+  transition: all 0.3s ease;
+}
+.searchbox input[type="search"]:focus,
+.field select:focus {
+  border-color: rgba(200, 230, 255, 0.5);
+  box-shadow: 0 0 18px rgba(200, 230, 255, 0.2);
+  outline: none;
+}
+
+.searchbox .btn {
+  background: radial-gradient(circle at 50% 30%, rgba(30,60,90,0.45), rgba(10,20,40,0.4));
+  border: 1px solid rgba(180,210,255,0.25);
+  color: #f3d88a;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.searchbox .btn:hover {
+  color: #fff8d0;
+  border-color: rgba(240,210,160,0.4);
+  box-shadow: 0 0 20px rgba(240,210,160,0.2);
+}
+
+/* ----- Filtros (era, custodio, etc.) ----- */
+.field label {
+  font-size: 0.85rem;
+  color: #bcd6ff;
+  font-family: "Cinzel", serif;
+}
+
+/* ----- Tarjetas (custodios o crónicas) ----- */
+.card-glass {
+  color: #eaf2ff;
+  background: rgba(180, 210, 255, 0.03);
+  border: 1px solid rgba(180, 210, 255, 0.18);
+  border-radius: 14px;
+  backdrop-filter: blur(16px) brightness(1.15);
+  -webkit-backdrop-filter: blur(16px) brightness(1.15);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.card-glass:hover {
+  transform: translateY(-5px);
+  border-color: rgba(180, 220, 255, 0.4);
+  box-shadow: 0 0 35px rgba(170, 230, 255, 0.18);
+}
+
+/* ----- Textos dentro de las tarjetas ----- */
+.card-glass h3 {
+  color: #ecf3ff;
+  font-size: 1.15rem;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.03em;
+}
+.card-glass p {
+  color: #a8bde2;
+  font-size: 0.9rem;
+}
+
+/* ----- Ajuste responsive general ----- */
+@media (max-width: 768px) {
+  .crumbs h1 { font-size: 1.8rem; }
+  .toolbar { flex-direction: column; align-items: center; }
+}
+
