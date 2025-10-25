@@ -1,5 +1,5 @@
 /* ==========================================================
-   SANTUARIO · Lluvia de runas + Portal del Gran Sello + Sonidos
+   SANTUARIO · Lluvia de runas + Portal + Audio sin microcortes
    ========================================================== */
 
 /* ---------- LLUVIA DE RUNAS (segura: no duplica) ---------- */
@@ -47,14 +47,9 @@ function initRuneRain(){
   }, 1800);
 }
 
-/* ---------- PORTAL + SONIDOS ---------- */
+/* ---------- PORTAL (recuerdo de sesión) ---------- */
 const GATE_KEY = 'nimroel_gate';
-const TTL_MIN  = 30; // tiempo de sesión "arcana"
-
-let sfxClick = null;     // campanita al pulsar
-let bgLoop  = null;      // canto de fondo (loop)
-let bgStarted = false;   // bandera de arranque del loop
-
+const TTL_MIN  = 30;
 function gateIsValid(){
   try{
     const raw = sessionStorage.getItem(GATE_KEY);
@@ -64,59 +59,82 @@ function gateIsValid(){
   }catch{ return false; }
 }
 function markGate(){
-  try{
-    sessionStorage.setItem(GATE_KEY, JSON.stringify({ t: Date.now() }));
-  }catch{}
+  try{ sessionStorage.setItem(GATE_KEY, JSON.stringify({ t: Date.now() })); }catch{}
 }
 
-function preloadAudio(){
+/* ---------- AUDIO ---------- */
+/* campanita → HTMLAudio (sencillo)
+   canto → Web Audio API (sin cortes) */
+let sfxClick = null;
+
+// Contexto de audio (Web Audio API)
+let audioCtx, gainNode, bgBuffer = null, bgSource = null, bgReady = false;
+
+async function setupAudio(){
+  // Efecto click
   try{
     sfxClick = new Audio('medios/audio/campanita.mp3');
     sfxClick.preload = 'auto';
     sfxClick.volume = 0.9;
+  }catch{}
 
-    bgLoop = new Audio('medios/audio/canto_index.mp3');
-    bgLoop.preload = 'auto';
-    bgLoop.loop = true;
-    bgLoop.volume = 0.5; // ajusta a gusto
-  }catch(e){
-    console.warn('Audio no disponible:', e);
-  }
-}
+  // Contexto y cadena
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new Ctx();
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.5; // volumen del fondo
+  gainNode.connect(audioCtx.destination);
 
-/* Intenta iniciar el loop inmediatamente (al cargar).
-   Si el navegador bloquea el autoplay, nos “enganchamos” al
-   siguiente gesto del usuario para arrancarlo. */
-async function ensureBgLoop(){
-  if(!bgLoop || bgStarted) return;
+  // Descarga + decodificación del mp3 (en memoria)
   try{
-    await bgLoop.play();
-    bgStarted = true;
+    const resp = await fetch('medios/audio/canto_index.mp3', { cache: 'force-cache' });
+    const buf  = await resp.arrayBuffer();
+    bgBuffer   = await audioCtx.decodeAudioData(buf);
+    bgReady    = true;
   }catch(e){
-    const kick = () => {
-      if(bgStarted || !bgLoop) return;
-      bgLoop.play().catch(()=>{});
-      bgStarted = true;
-      document.removeEventListener('click', kick);
-      document.removeEventListener('touchstart', kick);
-      document.removeEventListener('keydown', kick);
-    };
-    document.addEventListener('click', kick, { once:true });
-    document.addEventListener('touchstart', kick, { once:true });
-    document.addEventListener('keydown', kick, { once:true });
+    console.warn('No se pudo decodificar canto_index.mp3:', e);
   }
 }
 
+// Arranca el loop sin cortes
+function startBgLoop(options = {}){
+  if(!audioCtx || !bgBuffer) return;
+  if(bgSource){ try{ bgSource.stop(); }catch{} bgSource.disconnect(); bgSource = null; }
+
+  bgSource = audioCtx.createBufferSource();
+  bgSource.buffer = bgBuffer;
+  bgSource.loop = true;
+
+  // Si conoces puntos de loop exactos (para MP3 con silencios), descomenta:
+  // bgSource.loopStart = 0.00;  // segundos
+  // bgSource.loopEnd   = bgBuffer.duration; // o un valor menor si tu archivo tiene cola
+
+  bgSource.connect(gainNode);
+
+  // Algunos navegadores inician contexto en "suspended" → resume al gesto
+  const startNow = () => {
+    audioCtx.resume().then(()=>{
+      bgSource.start(0);
+    }).catch(()=>{});
+  };
+  // Si ya venimos de una interacción (click en runa), esto será inmediato:
+  startNow();
+}
+
+/* ---------- LÓGICA DEL PORTAL ---------- */
 async function unlockGate(){
-  if(sfxClick){
-    try{ await sfxClick.play(); }catch{}
-  }
+  // campanita
+  if(sfxClick){ try{ await sfxClick.play(); }catch{} }
+
+  // marca sesión
   markGate();
+
+  // oculta portal
   const gate = document.getElementById('gate');
   if(gate) gate.classList.add('hidden');
 
-  // Asegura que el loop esté sonando también tras desbloquear
-  ensureBgLoop();
+  // Inicia canto sin cortes (ya decodificado)
+  if(bgReady){ startBgLoop(); }
 
   document.body.classList.add('crystal-awake');
 }
@@ -128,6 +146,7 @@ function initGate(){
 
   if(gateIsValid()){
     gate.classList.add('hidden');
+    if(bgReady){ startBgLoop(); }
   }
 
   btn.addEventListener('click', unlockGate);
@@ -144,14 +163,8 @@ function initGate(){
 }
 
 /* ---------- INICIO ---------- */
-window.addEventListener('DOMContentLoaded', () => {
-  preloadAudio();
-
-  // La música de fondo debe sonar SIEMPRE que la página esté abierta
-  // (intentamos desde el arranque; si el navegador lo bloquea, arrancará
-  // en la primera interacción gracias a ensureBgLoop).
-  ensureBgLoop();
-
+window.addEventListener('DOMContentLoaded', async () => {
   initRuneRain();
+  await setupAudio();  // decodifica el canto en memoria
   initGate();
 });
