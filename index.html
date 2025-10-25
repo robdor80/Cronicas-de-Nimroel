@@ -125,7 +125,10 @@
       <a class="card-glass" href="paginas/linea_temporal/index.html">
         <div class="card-ico" aria-hidden="true">
           <!-- icono tiempo -->
-          <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-9 9a9 9 0 1 1 18 0"/></svg>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M6 2h12M6 22h12M8 2v4a4 4 0 0 0 1.2 2.8L12 12l2.8-3.2A4 4 0 0 0 16 6V2M8 22v-4a4 4 0 0 1 1.2-2.8L12 12l2.8 3.2A4 4 0 0 1 16 18v4"
+        fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
         </div>
         <div class="card-body">
           <h3>Línea temporal</h3>
@@ -174,6 +177,18 @@
     });
   }
 </script>
+
+<!-- Botón PWA personalizado (oculto por defecto) -->
+<button id="pwaInstall" class="install-cta hidden" aria-label="Instalar la app">
+  <!-- icono descarga/instalar -->
+  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <path d="M12 3v10m0 0l4-4m-4 4l-4-4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
+          fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span>Instalar</span>
+</button>
+
 
 </body>
 </html>

@@ -461,75 +461,44 @@ window.addEventListener('DOMContentLoaded', async () => {
 })();
 
 
-// =====================
-// PWA: botón “Instalar”
-// =====================
+// ---------------- PWA Install (captura consistente) ----------------
 let deferredPrompt = null;
-const installBtn = document.getElementById('pwa-install');
+const installBtn = document.getElementById('pwaInstall');
 
-// utilidades
-function isInStandalone(){
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
-function isIOS(){
-  const ua = navigator.userAgent;
-  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-// Si ya está en modo app → ocultar botón
-if (isInStandalone()) {
-  installBtn?.classList.add('disabled');
-  installBtn?.setAttribute('hidden', '');
-}
-
-// Guardamos el evento cuando el navegador ofrece instalar
+// Registrar el listener lo antes posible
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();               // evitamos mini-infobar
-  deferredPrompt = e;               // guardamos para usar al click
-  // si no estamos en standalone, aseguramos que el botón se vea activo
-  if (!isInStandalone()) {
-    installBtn?.classList.remove('disabled');
-    installBtn?.removeAttribute('hidden');
-  }
-});
+  // Evita la mini-infobar de Chrome
+  e.preventDefault();
+  deferredPrompt = e;
+  // Muestra tu botón
+  installBtn?.classList.remove('hidden');
+}, { once: true });
 
-// Click en “Instalar”
+// Al pulsar tu botón, muestra el prompt nativo
 installBtn?.addEventListener('click', async () => {
-  // Si ya estamos en app, no hacemos nada
-  if (isInStandalone()) return;
-
-  if (deferredPrompt) {
-    // Tenemos prompt nativo (Android/Chrome, Desktop)
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice; // 'accepted' | 'dismissed'
+  if (!deferredPrompt) return;
+  installBtn.disabled = true;
+  try {
+    const choice = await deferredPrompt.prompt();
+    // Opcional: choice.outcome => 'accepted' | 'dismissed'
+  } catch (_) {
+    // Ignora
+  } finally {
     deferredPrompt = null;
-    // si el usuario decide luego, el evento puede volver a dispararse
-    console.log('Instalación:', outcome);
-    if (outcome === 'accepted') {
-      installBtn.setAttribute('hidden', '');
-    }
-  } else {
-    // Sin prompt (Safari iOS o no cumple aún criterios): guía rápida
-    if (isIOS()) {
-      alert(
-        'Para instalar en iPhone/iPad:\n\n' +
-        '1) Pulsa el botón “Compartir”.\n' +
-        '2) Elige “Añadir a pantalla de inicio”.\n' +
-        '3) Confirma el nombre y toca “Añadir”.'
-      );
-    } else {
-      alert(
-        'Tu navegador aún no ofrece la instalación automática.\n' +
-        'Prueba a interactuar un poco con la página (click/scroll),\n' +
-        'y vuelve a intentarlo. También puedes borrar datos del sitio\n' +
-        'y recargar si ya rechazaste la instalación antes.'
-      );
-    }
+    installBtn.classList.add('hidden');
+    installBtn.disabled = false;
   }
 });
 
-// Cuando se complete la instalación
+// Si ya está instalada, oculta el botón
+function hideIfStandalone() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                    || window.navigator.standalone === true; // iOS
+  if (isStandalone) installBtn?.classList.add('hidden');
+}
+hideIfStandalone();
+
+// También ocúltalo cuando se complete la instalación
 window.addEventListener('appinstalled', () => {
-  console.log('PWA instalada 🎉');
-  installBtn?.setAttribute('hidden', '');
+  installBtn?.classList.add('hidden');
 });
