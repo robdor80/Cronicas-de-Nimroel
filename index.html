@@ -1,49 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Santuario de Nimroel — Terminal Arcana</title>
-
-  <!-- Estilos externos -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <!-- ===== FONDO DE LLUVIA DE RUNAS ===== -->
+  <!-- Fondo: lluvia de runas -->
   <div id="runeRain" aria-hidden="true"></div>
 
-  <!-- ===== PORTAL DEL GRAN SELLO DE JORVIN ===== -->
+  <!-- Portal del Gran Sello de Jorvin -->
   <section id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" aria-describedby="gate-desc">
     <div class="gate-card">
-      <h1 id="gate-title">Gran Sello de Jorvin activado</h1>
+      <h1 id="gate-title">Sello Mayor de Jorvin activado</h1>
       <p id="gate-desc">
-        Esta sesión está custodiada por la Cadena de Cronistas.<br>
+        Esta sesión está custodiada por la Cadena de Cronistas.<br />
         Para acceder al <em>Terminal de Cristal</em>, active la runa.
       </p>
 
       <button class="rune-btn" id="gateBtn" aria-label="Activar la runa y acceder">
-        <!-- Runa / sello minimal en SVG -->
         <svg viewBox="0 0 100 100" class="glow" aria-hidden="true">
-          <!-- anillo -->
-          <circle cx="50" cy="50" r="34" fill="none"
-                  stroke="url(#g)" stroke-width="4" />
-          <!-- ojo-runa -->
-          <path d="M20,50 Q50,30 80,50 Q50,70 20,50 Z" fill="none"
-                stroke="url(#g)" stroke-width="4" stroke-linecap="round" />
+          <circle cx="50" cy="50" r="34" fill="none" stroke="url(#g)" stroke-width="4" />
+          <path d="M20,50 Q50,30 80,50 Q50,70 20,50 Z" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round" />
           <circle cx="50" cy="50" r="5" fill="url(#g)" />
-
-          <!-- gradiente dorado -->
           <defs>
             <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0"  stop-color="#fff2b2"/>
-              <stop offset="1"  stop-color="#d6b663"/>
+              <stop offset="0" stop-color="#fff2b2"/>
+              <stop offset="1" stop-color="#d6b663"/>
             </linearGradient>
           </defs>
         </svg>
       </button>
 
-      
+      <div class="hint">Consejo: también puedes pulsar <kbd>Enter</kbd>.</div>
 
       <div class="status">
         <span class="status-dot" aria-hidden="true"></span>
@@ -52,7 +43,76 @@
     </div>
   </section>
 
-  <!-- Script externo -->
+  <!-- Terminal de Cristal (tarjetas) -->
+  <main id="terminal" aria-label="Terminal de Cristal del Santuario">
+    <header class="terminal-head">
+      <h2>Bienvenido a la Terminal de Cristal</h2>
+      <p class="terminal-sub">Seleccione un archivo del Santuario para consultar</p>
+    </header>
+
+    <section class="cards">
+      <!-- Crónicas -->
+      <a class="card-glass" href="pages/cronicas/index.html">
+        <div class="card-ico" aria-hidden="true">
+          <!-- icono libro -->
+          <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v13a2 2 0 0 1-2 2H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zM7 5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h9V6a1 1 0 0 0-1-1H7z"/></svg>
+        </div>
+        <div class="card-body">
+          <h3>Crónicas</h3>
+          <p>Relatos oficiales de los 16.000 años de historia de Nimroel.</p>
+        </div>
+      </a>
+
+      <!-- Magia -->
+      <a class="card-glass" href="pages/magia/index.html">
+        <div class="card-ico" aria-hidden="true">
+          <!-- icono varita -->
+          <svg viewBox="0 0 24 24"><path d="M3 21l7-7m1-8l-1 3 3-1 1-3-3 1zm8 8l-1 3 3-1 1-3-3 1zM11 13l7-7a2 2 0 0 1 3 3l-7 7"/></svg>
+        </div>
+        <div class="card-body">
+          <h3>Magia</h3>
+          <p>Disciplinas, sellos y protocolos del Santuario.</p>
+        </div>
+      </a>
+
+      <!-- Mapas -->
+      <a class="card-glass" href="pages/mapas/index.html">
+        <div class="card-ico" aria-hidden="true">
+          <!-- icono mapa -->
+          <svg viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v18l-6 2-6-2-6 2V5l6-2zM9 3v18M15 5v18"/></svg>
+        </div>
+        <div class="card-body">
+          <h3>Mapas</h3>
+          <p>Cartografías antiguas y rutas de los reinos.</p>
+        </div>
+      </a>
+
+      <!-- Personajes -->
+      <a class="card-glass" href="pages/personajes/index.html">
+        <div class="card-ico" aria-hidden="true">
+          <!-- icono persona -->
+          <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-9 9a9 9 0 1 1 18 0"/></svg>
+        </div>
+        <div class="card-body">
+          <h3>Personajes</h3>
+          <p>Personajes, Reyes y testigos de las eras.</p>
+        </div>
+      </a>
+
+      <!-- Razas -->
+      <a class="card-glass" href="pages/razas/index.html">
+        <div class="card-ico" aria-hidden="true">
+          <!-- icono árbol de vida -->
+          <svg viewBox="0 0 24 24"><path d="M12 2v6m0 0c3 0 5 2 5 5s-2 5-5 5-5-2-5-5 2-5 5-5zm0 10v4"/></svg>
+        </div>
+        <div class="card-body">
+          <h3>Razas</h3>
+          <p>Elfos, humanos, enanos y linajes perdidos.</p>
+        </div>
+      </a>
+    </section>
+  </main>
+
   <script src="script.js"></script>
 
   <noscript>

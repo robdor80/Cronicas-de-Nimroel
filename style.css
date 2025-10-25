@@ -192,3 +192,193 @@ html, body {
     0 0 0 6px rgba(243, 216, 138, 0.35),
     0 10px 30px rgba(0, 0, 0, 0.35);
 }
+
+/* ==========================================================
+   SANTUARIO · Terminal de Cristal (Tarjetas de acceso)
+   ========================================================== */
+
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* FONDO GENERAL */
+body {
+  background: radial-gradient(circle at 50% 30%, #0a0b11 0%, #07080d 100%);
+  color: #dfe8ff;
+  font-family: "Cinzel", "Segoe UI", serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* LLUVIA DE RUNAS */
+#runeRain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* PORTAL */
+#gate {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 3, 5, 0.95);
+  z-index: 10;
+  transition: opacity 1s ease;
+}
+#gate.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* TARJETA DEL PORTAL (ya la tenías, la mantengo por si la usas) */
+.gate-card {
+  text-align: center;
+  background: rgba(18, 25, 35, 0.55);
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 2rem 3rem;
+  box-shadow: 0 0 22px rgba(150, 220, 255, 0.1);
+  color: #f2f7ff;
+  max-width: 480px;
+}
+.rune-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  margin: 1.5rem auto;
+  transition: transform 0.2s;
+}
+.rune-btn:hover { transform: scale(1.07); }
+
+/* ========== TERMINAL DE CRISTAL ========== */
+#terminal {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1.5s ease, transform 1.5s ease;
+}
+body.crystal-awake #terminal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.terminal-head {
+  margin-top: 4rem;
+}
+.terminal-head h2 {
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+  color: #bcd6ff;
+  text-shadow: 0 0 15px rgba(180, 220, 255, 0.25);
+}
+.terminal-sub {
+  font-size: 0.95rem;
+  color: #93a5c8;
+  margin-top: 0.4rem;
+}
+
+/* === TARJETAS DE CRISTAL === */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 3rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.card-glass {
+  position: relative;
+  text-decoration: none;
+  color: #e7f1ff;
+  background: rgba(180, 210, 255, 0.02); /* 98% transparente */
+  border: 1px solid rgba(180, 210, 255, 0.18);
+  border-radius: 14px;
+  padding: 1.8rem 1.2rem;
+  overflow: hidden;
+  backdrop-filter: blur(18px) brightness(1.15);
+  -webkit-backdrop-filter: blur(18px) brightness(1.15);
+  box-shadow: 0 0 25px rgba(150, 200, 255, 0.08);
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* Reflejo diagonal muy leve */
+.card-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.02) 60%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.card-glass:hover {
+  transform: translateY(-6px);
+  border-color: rgba(180, 220, 255, 0.4);
+  box-shadow: 0 0 35px rgba(170, 230, 255, 0.18);
+}
+
+/* ICONOS */
+.card-ico {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+}
+.card-ico svg {
+  width: 100%;
+  height: 100%;
+  stroke: #cde7ff;
+  stroke-width: 1.6;
+  fill: none;
+}
+
+/* TEXTO */
+.card-body h3 {
+  font-size: 1.2rem;
+  color: #eaf2ff;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.03em;
+}
+.card-body p {
+  font-size: 0.9rem;
+  color: #a8bde2;
+}
+
+/* ADAPTACIÓN MÓVIL */
+@media (max-width: 600px) {
+  .cards {
+    padding: 1.5rem;
+    gap: 1.2rem;
+  }
+  .card-glass {
+    padding: 1.4rem 1rem;
+  }
+  .card-body p {
+    font-size: 0.85rem;
+  }
+  .terminal-head {
+    margin-top: 2.5rem;
+  }
+}
+
