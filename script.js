@@ -1,9 +1,12 @@
 /* ==========================================================
-   SANTUARIO · Lluvia de runas + Portal + Secuencia de cantos
+   SANTUARIO · Lluvia de runas + Portal + Alternancia A/B sin cortes
+   A = primer_canto.mp3   ·   B = segundo_canto.mp3
+   Secuencia: A → B → A → B → ... (con micro-crossfade)
+   Anti-autoplay: arranque tras recarga sin quedarnos mudos
    ========================================================== */
 
-/* ---------- LLUVIA DE RUNAS ---------- */
-const RUNES = ["ᚠ","ᚢ","ᚦ","ᚨ","ᚱ","ᚲ","ᚷ","ᚹ","ᚺ","ᚻ","ᚾ","ᛁ","ᛃ","ᛇ","ᛈ","ᛉ","ᛊ","ᛋ","ᛏ","ᛒ","ᛖ","ᛗ","ᛚ","ᛜ","ᛞ","ᛟ"];
+/* ---------- LLUVIA DE RUNAS (segura: no duplica) ---------- */
+const RUNES = ["ᚠ","ᚢ","ᚦ","ᚨ","ᚱ","ᚲ","ᚷ","ᚹ","ᚺ","ᚻ","ᚾ","ᛁ","ᛃ","ᛇ","ᛉ","ᛊ","ᛋ","ᛏ","ᛒ","ᛖ","ᛗ","ᛚ","ᛜ","ᛞ","ᛟ"];
 
 function initRuneRain(){
   const layer = document.getElementById('runeRain');
@@ -47,15 +50,9 @@ function initRuneRain(){
   }, 1800);
 }
 
-/* ---------- PORTAL Y AUDIO ---------- */
+/* ---------- PORTAL (recuerdo de sesión) ---------- */
 const GATE_KEY = 'nimroel_gate';
 const TTL_MIN  = 30;
-
-let sfxClick = null;
-let canto1 = null;
-let canto2 = null;
-let currentCanto = null;
-
 function gateIsValid(){
   try{
     const raw = sessionStorage.getItem(GATE_KEY);
@@ -68,67 +65,188 @@ function markGate(){
   try{ sessionStorage.setItem(GATE_KEY, JSON.stringify({ t: Date.now() })); }catch{}
 }
 
-function preloadAudio(){
+/* ---------- AUDIO ---------- */
+let sfxClick = null;
+
+let audioCtx = null, masterGain = null;
+let bufferA = null, bufferB = null;       // A: primer_canto · B: segundo_canto
+let current = null, nextUp = null;         // { source, gain, label, startTime, duration }
+let timers = [];                           // para limpiar setTimeouts al salir
+
+const FADE = 0.06; // segundos de crossfade
+
+function clearTimers(){
+  timers.forEach(id => clearTimeout(id));
+  timers = [];
+}
+
+function makeSource(buffer, label){
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = false; // alternamos manualmente
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(1, audioCtx.currentTime);
+  source.connect(gain).connect(masterGain);
+  return { source, gain, label, startTime: 0, duration: buffer.duration };
+}
+
+async function setupAudio(){
   try{
     sfxClick = new Audio('medios/audio/campanita.mp3');
     sfxClick.preload = 'auto';
     sfxClick.volume = 0.9;
+  }catch{}
 
-    canto1 = new Audio('medios/audio/primer_canto.mp3');
-    canto1.preload = 'auto';
-    canto1.volume = 0.5;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new Ctx();
 
-    canto2 = new Audio('medios/audio/segundo_canto.mp3');
-    canto2.preload = 'auto';
-    canto2.volume = 0.5;
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.55;
+  masterGain.connect(audioCtx.destination);
 
-    // Enlazamos la secuencia: cuando termina uno, suena el otro
-    canto1.addEventListener('ended', () => {
-      currentCanto = canto2;
-      canto2.currentTime = 0;
-      canto2.play().catch(()=>{});
-    });
-
-    canto2.addEventListener('ended', () => {
-      currentCanto = canto1;
-      canto1.currentTime = 0;
-      canto1.play().catch(()=>{});
-    });
-  }catch(e){
-    console.warn('Audio no disponible:', e);
+  async function loadToBuffer(url){
+    const resp = await fetch(url, { cache: 'force-cache' });
+    const arr  = await resp.arrayBuffer();
+    return await audioCtx.decodeAudioData(arr);
   }
-}
 
-async function startCantos(){
-  if (!canto1 || !canto2) return;
   try{
-    currentCanto = canto1;
-    canto1.currentTime = 0;
-    await canto1.play();
+    [bufferA, bufferB] = await Promise.all([
+      loadToBuffer('medios/audio/primer_canto.mp3'),
+      loadToBuffer('medios/audio/segundo_canto.mp3')
+    ]);
   }catch(e){
-    // En algunos navegadores necesita gesto del usuario
-    const kick = () => {
-      canto1.play().catch(()=>{});
-      document.removeEventListener('click', kick);
-      document.removeEventListener('keydown', kick);
-      document.removeEventListener('touchstart', kick);
-    };
-    document.addEventListener('click', kick, { once:true });
-    document.addEventListener('keydown', kick, { once:true });
-    document.addEventListener('touchstart', kick, { once:true });
+    console.warn('Error decodificando audio:', e);
   }
 }
 
+/* Alternancia A↔B programada con crossfade */
+function scheduleAlternation(startWith = 'A'){
+  if(!bufferA || !bufferB || !audioCtx) return;
+
+  stopMusicOnly();
+  clearTimers();
+
+  current = (startWith === 'A')
+    ? makeSource(bufferA, 'A')
+    : makeSource(bufferB, 'B');
+
+  const startNow = () => {
+    const now = audioCtx.currentTime;
+    current.startTime = now;
+    try { current.source.start(now); } catch(e){}
+    programNextCrossfade();
+  };
+
+  // Reanuda el contexto si está suspendido
+  audioCtx.resume().then(startNow).catch(()=>{
+    // si falla (autoplay), lo intentaremos tras un gesto del usuario
+  });
+}
+
+function programNextCrossfade(){
+  if(!current) return;
+
+  const now = audioCtx.currentTime;
+  const endTime   = current.startTime + current.duration;
+  const crossTime = Math.max(now + 0.01, endTime - FADE);
+
+  const comingLabel = (current.label === 'A') ? 'B' : 'A';
+  const comingBuf   = (comingLabel === 'A') ? bufferA : bufferB;
+
+  nextUp = makeSource(comingBuf, comingLabel);
+  nextUp.gain.gain.setValueAtTime(0, now);
+
+  const startNext = () => {
+    try {
+      nextUp.source.start(crossTime);
+      // crossfade
+      current.gain.gain.setValueAtTime(current.gain.gain.value, crossTime);
+      current.gain.gain.linearRampToValueAtTime(0, crossTime + FADE);
+
+      nextUp.gain.gain.setValueAtTime(0, crossTime);
+      nextUp.gain.gain.linearRampToValueAtTime(1, crossTime + FADE);
+    } catch(e){}
+  };
+
+  const swapAndContinue = () => {
+    try { current.source.stop(); } catch(e){}
+    try { current.source.disconnect(); current.gain.disconnect(); } catch(e){}
+    current = nextUp;
+    current.startTime = crossTime;
+    nextUp = null;
+    programNextCrossfade();
+  };
+
+  const msToStart = Math.max(0, (crossTime - now) * 1000);
+  const msToSwap  = Math.max(0, (crossTime + FADE - now) * 1000);
+
+  timers.push(setTimeout(startNext, msToStart));
+  timers.push(setTimeout(swapAndContinue, msToSwap));
+}
+
+/* Detiene solo música (mantiene contexto por si reanudamos) */
+function stopMusicOnly(){
+  try{
+    if(current){
+      try{ current.source.stop(); }catch{}
+      try{ current.source.disconnect(); current.gain.disconnect(); }catch{}
+      current = null;
+    }
+    if(nextUp){
+      try{ nextUp.source.stop(); }catch{}
+      try{ nextUp.source.disconnect(); nextUp.gain.disconnect(); }catch{}
+      nextUp = null;
+    }
+  }catch{}
+}
+
+/* Limpia TODO al salir de la página */
+function stopBgAudio(){
+  clearTimers();
+  stopMusicOnly();
+  try{
+    if(masterGain){ masterGain.disconnect(); masterGain = null; }
+    if(audioCtx){ const ctx = audioCtx; audioCtx = null; ctx.close().catch(()=>{}); }
+  }catch{}
+  bufferA = bufferB = null;
+}
+
+/* ---- Anti-autoplay tras RECARGA con sesión válida ---- */
+let armedAutoplayFix = false;
+function armAutoplayBypass(startLabel = 'A'){
+  if(armedAutoplayFix) return;
+  armedAutoplayFix = true;
+
+  const kick = () => {
+    // reanuda contexto y lanza la alternancia
+    if(audioCtx && audioCtx.state !== 'running'){
+      audioCtx.resume().catch(()=>{});
+    }
+    scheduleAlternation(startLabel);
+
+    // limpiar escuchas
+    document.removeEventListener('pointerdown', kick);
+    document.removeEventListener('keydown', kick);
+    document.removeEventListener('touchstart', kick);
+  };
+
+  document.addEventListener('pointerdown', kick, { once:true });
+  document.addEventListener('keydown', kick, { once:true });
+  document.addEventListener('touchstart', kick, { once:true });
+}
+
+/* ---------- LÓGICA DEL PORTAL ---------- */
 async function unlockGate(){
-  if(sfxClick){
-    try{ await sfxClick.play(); }catch{}
-  }
+  if(sfxClick){ try{ await sfxClick.play(); }catch{} }
   markGate();
 
   const gate = document.getElementById('gate');
   if(gate) gate.classList.add('hidden');
 
-  await startCantos(); // inicia la secuencia canto1 → canto2 → bucle
+  // Empieza la secuencia desde A (primer_canto)
+  scheduleAlternation('A');
+
   document.body.classList.add('crystal-awake');
 }
 
@@ -139,7 +257,15 @@ function initGate(){
 
   if(gateIsValid()){
     gate.classList.add('hidden');
-    startCantos();
+
+    // Intento directo
+    scheduleAlternation('A');
+
+    // Si el contexto quedó "suspended" por recarga/autoplay,
+    // armamos bypass: en el primer gesto, reanudamos y arrancamos.
+    if(audioCtx && audioCtx.state !== 'running'){
+      armAutoplayBypass('A');
+    }
   }
 
   btn.addEventListener('click', unlockGate);
@@ -153,18 +279,15 @@ function initGate(){
     if(gate.classList.contains('hidden')) return;
     if(e.key === 'Enter'){ unlockGate(); }
   });
-
-  // Detiene cantos al salir de la página
-  window.addEventListener('beforeunload', ()=>{
-    [canto1, canto2].forEach(a=>{
-      if(a){ a.pause(); a.currentTime = 0; }
-    });
-  });
 }
 
+/* ---------- LIMPIEZA AL NAVEGAR A OTRA PÁGINA ---------- */
+window.addEventListener('pagehide', stopBgAudio);
+window.addEventListener('beforeunload', stopBgAudio);
+
 /* ---------- INICIO ---------- */
-window.addEventListener('DOMContentLoaded', () => {
-  preloadAudio();
+window.addEventListener('DOMContentLoaded', async () => {
   initRuneRain();
-  initGate();
+  await setupAudio();   // decodifica A y B
+  initGate();           // si la sesión es válida, intenta arrancar A→B (con bypass gestual si hace falta)
 });
